@@ -5,11 +5,11 @@ from solver.utils import read_lines
 data_path = Path(__file__).parent.parent.absolute() / "data"
 
 
-def solve_1(path: str):
+def solve_1(path: Path):
     data = read_lines(path)
 
 
-def solve_2(path: str):
+def solve_2(path: Path):
     data = read_lines(path)
 
 

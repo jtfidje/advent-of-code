@@ -7,11 +7,10 @@ from solver import utils
 data_path = Path(__file__).parent.parent.absolute() / "data"
 
 
-def solve(path: str):
+def solve(path: str | Path):
     data = utils.read_lines(path)
 
 
 if __name__ == "__main__":
     answer = solve(Path(data_path, "input.txt"))
-    if answer is not None:
-        print(f"Problem 2: {answer}")
+    print(f"Problem 1: {answer}")

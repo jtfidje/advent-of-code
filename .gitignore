@@ -8,6 +8,7 @@
 .pytest_cache/
 __pycache__/
 .venv
+*.egg-info
 
 # Rust
 target/
@@ -16,3 +17,4 @@ target/
 data/
 input.txt
 example*.txt
+!templates/data/*.txt

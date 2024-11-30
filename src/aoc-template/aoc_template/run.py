@@ -24,7 +24,7 @@ project_path = Path(settings.project_root, year, "python", f"day-{day}")
 if not project_path.exists():
     logger.info(f"Creating project at {project_path}")
     project_path.mkdir(parents=True)
-    
+
     # Copy template files
     logger.info("Copying template files")
     subprocess.run(f"cp -r templates/* {project_path}/.", shell=True)
@@ -35,7 +35,7 @@ if not project_path.exists():
         puzzle_input = utils.fetch_puzzle_input(aoc_base_url, session)
         time.sleep(0.3)  # Be nice to the server?
         puzzle_title = utils.fetch_puzzle_title(aoc_base_url, session)
-        
+
     # Write puzzle input to file
     logger.info("Writing puzzle input to file")
     with open(project_path / "data" / "input.txt", "w") as f:
@@ -53,7 +53,7 @@ if not project_path.exists():
 
     # Install dependencies and the project in the virtualenv
     logger.info("Installing dependencies and the project in the virtualenv")
-    subprocess.run(["poetry", "install", "--directory", project_path])
+    subprocess.run(["uv", "sync", "--directory", project_path])
 
     # Start VSCode
     logger.info("Starting VSCode")

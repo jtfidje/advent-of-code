@@ -6,6 +6,8 @@ import sys
 import time
 from contextlib import contextmanager
 from datetime import datetime
+from pathlib import Path
+from typing import Generator
 from zoneinfo import ZoneInfo
 
 from loguru import logger
@@ -17,26 +19,35 @@ from aoc_template.config import settings
 
 def block_execution(year: int, day: int):
     """Block execution until the time has passed a target time
-    
+
     Target: {year}-12-{day}T06:00:00 Europe/Oslo
     """
+
+    def puzzle_released(current: datetime, target: datetime) -> bool:
+        return current >= target
+
     target_time = datetime(year, 12, day, 6, 0, 0, tzinfo=ZoneInfo("Europe/Oslo"))
-    
-    _now = None
-    def puzzle_released() -> bool:
-        nonlocal _now
-        _now = datetime.now(tz=ZoneInfo("Europe/Oslo"))
-        return _now >= target_time
+    _now = datetime.now(tz=ZoneInfo("Europe/Oslo"))
 
-    if puzzle_released():
+    # NOTE: The early check here is to avoid the "waiting" message and the empty
+    #       cleanup-printif the puzzle has already been released.
+    if puzzle_released(_now, target_time):
         return
-    
-    msg_template = f"  Waiting for puzzle to be released @ {target_time.strftime('%d.%b %H:%M:%S')} ... "
-    while not puzzle_released():
-        print(f"[bold][grey74]{msg_template}[/grey74][grey46]{_now.strftime('%d.%b %H:%M:%S')}[/grey46][/bold]", end="\r")
-        time.sleep(0.5)
-    print()
 
+    msg_template = (
+        f"  Waiting for puzzle to be released @ "
+        f"{target_time.strftime('%d.%b %H:%M:%S')} ... "
+    )
+    while not puzzle_released(_now, target_time):
+        print(
+            f"[bold][grey74]{msg_template}[/grey74][grey46]"
+            f"{_now.strftime('%d.%b %H:%M:%S')}[/grey46][/bold]",
+            end="\r",
+        )
+        time.sleep(0.5)
+        _now = datetime.now(tz=ZoneInfo("Europe/Oslo"))
+
+    print()
 
 
 def parse_arguments() -> tuple[str, str]:
@@ -50,9 +61,8 @@ def parse_arguments() -> tuple[str, str]:
     _year, _today = datetime.now().strftime("%Y %d").split()
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "year", type=str, help="AoC year (i.e.: 2022)", nargs="?", default=_year
+        "year", type=str, help="AoC year (i.e.: 2024)", nargs="?", default=_year
     )
-
     parser.add_argument(
         "day", type=str, help="AoC Day as string (i.e.: 02)", nargs="?", default=_today
     )
@@ -62,7 +72,7 @@ def parse_arguments() -> tuple[str, str]:
 
 
 @contextmanager
-def get_aoc_session() -> Session:
+def get_aoc_session() -> Generator[Session, None, None]:
     """Returns a requests.Session with the AoC session cookie set
 
     Returns:
@@ -114,10 +124,16 @@ def fetch_puzzle_title(puzzle_url: str, session: Session) -> str:
         logger.error(f"Failed to fetch puzzle title: {err}")
         sys.exit(1)
 
-    return re.search(r"(--- Day \d+: .* ---)", response.text)[1]
+    res = re.search(r"(--- Day \d+: .* ---)", response.text)
+
+    if res is None:
+        logger.error("Failed to parse puzzle title")
+        sys.exit(1)
+
+    return res[1]
 
 
-def start_vscode(project_path: str):
+def start_vscode(project_path: Path):
     """Starts VSCode in the project path and open relevant files
 
     Args:
@@ -126,7 +142,7 @@ def start_vscode(project_path: str):
     try:
         subprocess.run(
             (
-                f"code-insiders --reuse-window "
+                f"code --reuse-window "
                 f"{project_path} "
                 f"{project_path}/data/example_1.txt "
                 f"{project_path}/data/example_2.txt "
@@ -143,7 +159,7 @@ def start_vscode(project_path: str):
         sys.exit(1)
 
 
-def start_watcher(project_path: str):
+def start_watcher(project_path: Path):
     """Starts an inotifywait-watcher that performs the following on change:
 
       - clear the screen
@@ -156,12 +172,14 @@ def start_watcher(project_path: str):
     os.chdir(project_path)
     subprocess.run(
         (
-            "PYTHONDONOTWRITEBYTECODE=1 bash -c '"
+            "PYTHONDONOTWRITEBYTECODE=1 "
+            f"VIRTUAL_ENV={project_path}/.venv "
+            "bash -c '"
             f"while inotifywait -q -re modify {project_path} ; "
             "do clear && "
-            "poetry run pytest tests/ -p no:cacheprovider && "
-            "poetry run python solver/part_1.py && "
-            "poetry run python solver/part_2.py ; "
+            "uv run pytest tests/ -p no:cacheprovider && "
+            "uv run python solver/part_1.py && "
+            "uv run python solver/part_2.py ; "
             "done'"
         ),
         shell=True,

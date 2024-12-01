@@ -13,7 +13,7 @@ def json_print(obj: dict | list) -> None:
     print(json.dumps(obj, indent=4))
 
 
-def read_data(path: str) -> str:
+def read_data(path: str | Path) -> str:
     """
     Read and return the contents of a file as a string.
 
@@ -43,7 +43,7 @@ def read_lines(path: str | Path) -> list[str]:
         return lines
 
 
-def read_numbers(path: str) -> list[int]:
+def read_numbers(path: str | Path) -> list[int]:
     """
     Read numbers from a file and return them as a list of integers.
 

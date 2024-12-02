@@ -12,82 +12,58 @@ def check_diff(a, b):
     return 1 <= diff <= 3
 
 
+def check_increase(numbers: list[int]) -> bool:
+    for x, y in utils.sliding_window(numbers, 2, 1):
+        if x >= y:
+            return False
+
+        if not check_diff(x, y):
+            return False
+
+    return True
+
+
+def check_decrease(numbers: list[int]) -> bool:
+    for x, y in utils.sliding_window(numbers, 2, 1):
+        if x <= y:
+            return False
+
+        if not check_diff(x, y):
+            return False
+
+    return True
+
+
 def solve(path: str | Path):
     data = utils.read_lines(path)
-    numbers_arr = []
+    numbers_arr: list[list[int]] = []
     for line in data:
         numbers_arr.append(list(map(int, line.split(" "))))
 
     safe_count = 0
     for numbers in numbers_arr:
         # Check increase
-        has_skipped = False
-        skip_next = False
-        # 50, 48, 49, 51, 53, 55, 56, 55
-        for i, (x, y) in enumerate(utils.sliding_window([-1, *numbers], 2, 1)):
-            if skip_next:
-                skip_next = False
-                continue
-
-            if x >= y:
-                if has_skipped:
-                    break
-
-                if i == len(numbers) - 2:
-                    continue
-
-                has_skipped = True
-                skip_next = True
-                z = numbers[i + 2]
-
-                if x >= z:
-                    break
-
-                if check_diff(x, z):
-                    continue
-
-            else:
-                if not check_diff:
-                    break
-
-                continue
-        else:
+        if check_increase(numbers):
             safe_count += 1
             continue
 
         # Check decrease
-        has_skipped = False
-        skip_next = False
-        for i, (x, y) in enumerate(utils.sliding_window(numbers, 2, 1)):
-            if skip_next:
-                skip_next = False
-                continue
-
-            if x <= y:
-                if has_skipped:
-                    break
-
-                if i == len(numbers) - 2:
-                    continue
-
-                has_skipped = True
-                skip_next = True
-                z = numbers[i + 2]
-                if x <= z:
-                    break
-
-                if check_diff(x, z):
-                    continue
-
-            else:
-                if not check_diff(x, y):
-                    break
-
-                continue
-        else:
-            # Check last window
+        if check_decrease(numbers):
             safe_count += 1
             continue
+
+        for i in range(len(numbers)):
+            removed_numbers = numbers[:]
+            removed_numbers.pop(i)
+            # Check increase
+            if check_increase(removed_numbers):
+                safe_count += 1
+                break
+
+            # Check decrease
+            if check_decrease(removed_numbers):
+                safe_count += 1
+                break
 
     return safe_count
 

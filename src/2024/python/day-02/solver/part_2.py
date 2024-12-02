@@ -1,14 +1,16 @@
 # flake8: noqa: F401
-
+import math
 from pathlib import Path
 
 from solver import utils
 
 data_path = Path(__file__).parent.parent.absolute() / "data"
 
+
 def check_diff(a, b):
     diff = abs(a - b)
     return 1 <= diff <= 3
+
 
 def solve(path: str | Path):
     data = utils.read_lines(path)
@@ -20,15 +22,25 @@ def solve(path: str | Path):
     for numbers in numbers_arr:
         # Check increase
         has_skipped = False
-        skip_index = None
-        for i, (x, y, z) in enumerate(utils.sliding_window(numbers, 3, 1)):
-            if x > y:
+        skip_next = False
+        # 50, 48, 49, 51, 53, 55, 56, 55
+        for i, (x, y) in enumerate(utils.sliding_window([-1, *numbers], 2, 1)):
+            if skip_next:
+                skip_next = False
+                continue
+
+            if x >= y:
                 if has_skipped:
                     break
-                
+
+                if i == len(numbers) - 2:
+                    continue
+
                 has_skipped = True
-                skip_index = i + 1
-                if x > z:
+                skip_next = True
+                z = numbers[i + 2]
+
+                if x >= z:
                     break
 
                 if check_diff(x, z):
@@ -40,30 +52,28 @@ def solve(path: str | Path):
 
                 continue
         else:
-            is_safe = True
-
-            if skip_index == len(numbers) - 2:
-                ...
-
-            else:
-                x, y = numbers[-2:]
-                
-                if x > y:
-                    if not check_diff(x, z):
-                        is_safe = False
-
-            safe_count += int(is_safe)
+            safe_count += 1
             continue
 
         # Check decrease
         has_skipped = False
-        for x, y, z in utils.sliding_window(numbers[:-1], 3, 1):
-            if x < y:
+        skip_next = False
+        for i, (x, y) in enumerate(utils.sliding_window(numbers, 2, 1)):
+            if skip_next:
+                skip_next = False
+                continue
+
+            if x <= y:
                 if has_skipped:
                     break
-                
+
+                if i == len(numbers) - 2:
+                    continue
+
                 has_skipped = True
-                if x < z:
+                skip_next = True
+                z = numbers[i + 2]
+                if x <= z:
                     break
 
                 if check_diff(x, z):
@@ -78,14 +88,8 @@ def solve(path: str | Path):
             # Check last window
             safe_count += 1
             continue
-        
+
     return safe_count
-            
-
-
-
-
-
 
 
 if __name__ == "__main__":

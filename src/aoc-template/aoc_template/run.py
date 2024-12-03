@@ -27,7 +27,7 @@ if not project_path.exists():
 
     # Copy template files
     logger.info("Copying template files")
-    subprocess.run(f"cp -r templates/* {project_path}/.", shell=True)
+    subprocess.run(f"cp -r templates/. {project_path}/.", shell=True)
 
     # Fetch puzzle input and title
     logger.info("Fetching puzzle input and title")
@@ -44,10 +44,11 @@ if not project_path.exists():
     # Replace placeholder vars in README.md
     logger.info("Replacing placeholder vars in README.md")
     with open(project_path / "README.rst", "r+") as f:
-        readme = f.read()
-        readme = readme.replace(r"{day}", day)
-        readme = readme.replace(r"{year}", year)
-        readme = readme.replace(r"{title}", puzzle_title)
+        readme = f.read().format(
+            title=puzzle_title,
+            year=year,
+            day=day,
+        )
         f.seek(0)
         f.write(readme)
 

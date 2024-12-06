@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Generator
+from typing import Any, Generator, Literal, Sequence
 
 
 def json_print(obj: dict | list) -> None:
@@ -166,3 +166,93 @@ def get_adjacent(
             adjacent.add(position)
 
     return adjacent
+
+
+def rotate_clockwise(array: list[Any], rotations: Literal[1, 2, 3]) -> list[Any]:
+    """
+    [
+        1 2 3
+        4 5 6
+        7 8 9
+    ]
+    [
+        7 4 1
+        8 5 2
+        9 6 3
+    ]
+    [
+        9 8 7
+        6 5 4
+        3 2 1
+    ]
+    [
+        3 6 9
+        2 5 1
+        1 4 7
+    ]
+    """
+    match rotations:
+        case 1:
+            return [
+                [row[col_i] for row in array[::-1]] for col_i in range(len(array[0]))
+            ]
+
+        case 2:
+            return [row[::-1] for row in array[::-1]]
+
+        case 3:
+            return [
+                [row[col_i - 1] for row in array]
+                for col_i in range(len(array[0]), 0, -1)
+            ]
+
+
+def rotate_45(
+    matrix: list[list[Any]], direction: Literal[-1, 1], min_length: int | None = None
+):
+    mat_len = len(matrix)
+
+    if not set([mat_len]) == set(len(row) for row in matrix):
+        raise ValueError("Matrix has to be a square")
+
+    if min_length is None:
+        min_length = mat_len
+    elif not (1 <= min_length <= mat_len):
+        raise ValueError("Min length has to be between 1 and matrix length")
+
+    lower_col_range = range(mat_len - min_length, min_length - mat_len - 1, -1)
+    upper_col_range = range(mat_len + 1, mat_len - min_length, -1)
+    for lower_col, upper_col in zip(lower_col_range, upper_col_range):
+        lower_col = max(lower_col, 0)
+        upper_col = min(upper_col, mat_len)
+
+        print(list(range(lower_col, upper_col)))
+        ...
+
+
+def sliding_box(
+    matrix: list[list[Any]],
+    width: int,
+    height: int,
+    x_step: int | None,
+    y_step: int | None,
+    include_remainder: bool = False,
+) -> Generator[list[list[Any]]]:
+    """
+    [
+        [ 1,  2,  3,  4],
+        [ 5,  6,  7,  8],
+        [ 9, 10, 11, 12],
+        [13, 14, 15, 16]
+    ]
+
+    """
+    if x_step is None:
+        x_step = width
+
+    if y_step is None:
+        y_step = height
+
+    for row_i in range(0, len(matrix) - height + 1, y_step):
+        for col_i in range(0, len(matrix[0]) - width + 1, x_step):
+            yield [row[col_i : col_i + width] for row in matrix[row_i : row_i + height]]

@@ -220,13 +220,26 @@ def rotate_45(
     elif not (1 <= min_length <= mat_len):
         raise ValueError("Min length has to be between 1 and matrix length")
 
-    lower_col_range = range(mat_len - min_length, min_length - mat_len - 1, -1)
-    upper_col_range = range(mat_len + 1, mat_len - min_length, -1)
-    for lower_col, upper_col in zip(lower_col_range, upper_col_range):
+    lower_range = range(mat_len - min_length, 0 - min_length, -1)
+    upper_range = range(mat_len + min_length - 1, mat_len - min_length, -1)
+    print(lower_range)
+    print(upper_range)
+
+    ranges = []
+    for lower_col, upper_col in zip(lower_range, upper_range):
         lower_col = max(lower_col, 0)
         upper_col = min(upper_col, mat_len)
 
+        ranges.append((lower_col, upper_col))
         print(list(range(lower_col, upper_col)))
+
+    for (lower_col, upper_col), (lower_row, upper_row) in zip(ranges, ranges[::-1]):
+        diagonal = [
+            matrix[row][col]
+            for row, col in zip(
+                range(lower_row, upper_row), range(lower_col, upper_col)
+            )
+        ]
         ...
 
 

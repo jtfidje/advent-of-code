@@ -28,26 +28,28 @@ def solve(path: str | Path):
         if re.match(r"^\d+\.+$", disk):
             break
 
-        print(disk)
-
         next_free: re.Match[str] = re.search(r"\.+", disk)  # type: ignore
-        next_block: re.Match[str] = re.search(r"\d+\.*$", disk)  # type: ignore
+        # next_block: re.Match[str] = re.search(r"\d+\.*$", disk)  # type: ignore
 
         i_free = next_free.start()
-        i_block = next_block.start()
+        # i_block = next_block.start()
 
         free_count = next_free.end() - i_free
-        print(disk[:i_free])
-        print(disk[i_block:].replace(".", "")[-free_count:][::-1])
-        print(disk[i_free + free_count : next_block.end() - free_count - 1])
+
+        next_block = ""
+        i = len(disk)
+        while len(next_block) < free_count:
+            i -= 1
+            char = disk[i]
+            if disk[i] != ".":
+                next_block += char
 
         disk = (
             disk[:i_free]
-            + disk[i_block:].replace(".", "")[-free_count:][::-1]
-            + disk[i_free + free_count : next_block.start()]
-            + "." * (len(disk[next_block.start() :]) - free_count)
+            + next_block
+            + disk[i_free + free_count : i]
+            + "." * len(disk[i:])
         )
-        print()
 
     return sum(i * int(num) for i, num in enumerate(disk) if num != ".")
 

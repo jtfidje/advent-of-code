@@ -9,49 +9,50 @@ data_path = Path(__file__).parent.parent.absolute() / "data"
 
 def solve(path: str | Path):
     data = list(map(int, list(utils.read_data(path))))
-    disk = ""
-    _disk = []
-
-    blocks = []
-    free = []
+    disk = []
 
     for i, num in enumerate(data):
         if i % 2 == 0:
             _id = i // 2
-            _disk.append((_id, num))
-            disk += str(_id) * num
+            disk.append((_id, num))
         else:
-            _disk.append((".", num))
-            disk += "." * num
+            if num == 0:
+                continue
+            disk.append((".", num))
 
-    while True:
-        if re.match(r"^\d+\.+$", disk):
+    sorted_disk = []
+    while disk:
+        block = disk.pop(0)
+
+        if block[0] != ".":
+            sorted_disk.append(block)
+            continue
+
+        try:
+            while (last_block := disk.pop(-1))[0] == ".":
+                continue
+        except Exception:
             break
 
-        next_free: re.Match[str] = re.search(r"\.+", disk)  # type: ignore
-        # next_block: re.Match[str] = re.search(r"\d+\.*$", disk)  # type: ignore
+        if block[1] < last_block[1]:
+            sorted_disk.append((last_block[0], block[1]))
+            disk.append((last_block[0], last_block[1] - block[1]))
 
-        i_free = next_free.start()
-        # i_block = next_block.start()
+        elif block[1] > last_block[1]:
+            sorted_disk.append(last_block)
+            disk.insert(0, (block[0], block[1] - last_block[1]))
 
-        free_count = next_free.end() - i_free
+        else:
+            sorted_disk.append(last_block)
 
-        next_block = ""
-        i = len(disk)
-        while len(next_block) < free_count:
-            i -= 1
-            char = disk[i]
-            if disk[i] != ".":
-                next_block += char
+    total = 0
+    i = 0
+    for block in sorted_disk:
+        for _ in range(block[1]):
+            total += block[0] * i
+            i += 1
 
-        disk = (
-            disk[:i_free]
-            + next_block
-            + disk[i_free + free_count : i]
-            + "." * len(disk[i:])
-        )
-
-    return sum(i * int(num) for i, num in enumerate(disk) if num != ".")
+    return total
 
 
 if __name__ == "__main__":

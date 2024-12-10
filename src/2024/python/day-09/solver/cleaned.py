@@ -21,30 +21,103 @@ def map_sectors(disk_map: Iterable[int]) -> list[tuple[int | str, int]]:
 
 def solve_1(path: Path):
     disk_map = map(int, utils.read_data(path))
-    disk = []
-    for sector_id, sector_size in map_sectors(disk_map):
-        disk += [sector_id] * sector_size
+    disk = map_sectors(disk_map)
 
-    checksum = 0
-    for i, value in enumerate(disk):
-        if value == ".":
-            tail_i, tail_value = next(
-                (j, disk[j]) for j in range(len(disk) - 1, -1, -1) if disk[j] != "."
-            )
+    compact_disk = []
 
-            if tail_i < i:
-                break
+    while disk:
+        while (tail_block := disk.pop(-1))[0] == ".":
+            continue
 
-            disk[i] = tail_value
-            disk[tail_i] = "."
+        if not disk:
+            compact_disk.append(tail_block)
+            break
 
-        checksum += i * disk[i]
+        while (head_block := disk.pop(0))[0] != ".":
+            compact_disk.append(head_block)
 
-    return checksum
+        if not disk:
+            compact_disk.append(tail_block)
+            break
+
+        h_block_id, h_block_size = head_block
+        t_block_id, t_block_size = tail_block
+
+        if h_block_size > t_block_size:
+            disk.insert(0, (".", h_block_size - t_block_size))
+            compact_disk.append(tail_block)
+
+        elif h_block_size < t_block_size:
+            compact_disk.append((t_block_id, h_block_size))
+            disk.append((t_block_id, t_block_size - h_block_size))
+
+        else:
+            compact_disk.append(tail_block)
+
+    total = 0
+    i = -1
+    for block_id, block_size in compact_disk:
+        for i in range(i + 1, i + block_size + 1):
+            total += block_id * i
+
+    return total
 
 
 def solve_2(path: Path):
-    data = utils.read_lines(path)
+    disk_map = map(int, utils.read_data(path))
+    disk = map_sectors(disk_map)
+
+    compact_disk_head = []
+    compact_disk_tail = []
+
+    while disk:
+        # Add file-blocks to compact disk
+        if disk[0][0] != ".":
+            compact_disk_head.append(disk.pop(0))
+            continue
+
+        t_block_id, t_block_size = tail_block = disk.pop(-1)
+
+        # Insert dangling free space to compact_disk_tail
+        # Continue parent loop in case this was the last block
+        if t_block_id == ".":
+            compact_disk_tail.insert(0, tail_block)
+            continue
+
+        for disk_i, head_block in enumerate(disk):
+            h_block_id, h_block_size = head_block
+
+            if h_block_id != ".":
+                continue
+
+            if h_block_size < t_block_size:
+                continue
+
+            compact_disk_tail.insert(0, (".", t_block_size))
+
+            if h_block_size > t_block_size:
+                disk[disk_i] = (".", h_block_size - t_block_size)
+                disk.insert(disk_i, tail_block)
+            else:
+                disk[disk_i] = tail_block
+
+            break
+
+        else:
+            # No free blocks for tail_block!
+            compact_disk_tail.insert(0, tail_block)
+
+    total = 0
+    i = -1
+    for block_id, block_size in [*compact_disk_head, *compact_disk_tail]:
+        if block_id == ".":
+            i += block_size
+            continue
+
+        for i in range(i + 1, i + block_size + 1):
+            total += block_id * i
+
+    return total
 
 
 if __name__ == "__main__":

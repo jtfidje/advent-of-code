@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import pytest
-
 from solver import cleaned, part_1, part_2
 
 data_path = Path(__file__).parent.parent.absolute() / "data"
@@ -12,8 +10,8 @@ data_path = Path(__file__).parent.parent.absolute() / "data"
 answer_example_1 = 36
 answer_example_2 = 81
 
-answer_part_1 = ...
-answer_part_2 = ...
+answer_part_1 = 629
+answer_part_2 = 1242
 
 # ------------------------------
 
@@ -34,31 +32,25 @@ def test_solve_2_run_example():
         assert answer == answer_example_2
 
 
-@pytest.mark.skip()
 def test_solve_1_run_input():
     assert part_1.solve(data_path / "input.txt") == answer_part_1
 
 
-@pytest.mark.skip()
 def test_solve_2_run_input():
     assert part_2.solve(data_path / "input.txt") == answer_part_2
 
 
-@pytest.mark.skip()
 def test_solve_1_cleaned_example():
     assert cleaned.solve_1(data_path / "example_1.txt") == answer_example_1
 
 
-@pytest.mark.skip()
 def test_solve_2_cleaned_example():
     assert cleaned.solve_2(data_path / "example_2.txt") == answer_example_2
 
 
-@pytest.mark.skip()
 def test_solve_1_cleaned_input():
     assert cleaned.solve_1(data_path / "input.txt") == answer_part_1
 
 
-@pytest.mark.skip()
 def test_solve_2_cleaned_input():
     assert cleaned.solve_2(data_path / "input.txt") == answer_part_2

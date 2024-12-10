@@ -1,0 +1,12 @@
+{
+"python.REPL.enableREPLSmartSend": false,
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.rulers": [88]
+  }
+}

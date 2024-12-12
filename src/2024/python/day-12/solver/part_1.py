@@ -1,12 +1,8 @@
 # flake8: noqa: F401
 import math
+from copy import deepcopy
 from functools import cache
 from pathlib import Path
-
-import matplotlib.path as pltPath
-import shapely.geometry
-import shapely.geometry.polygon
-import sympy
 
 from solver import utils
 
@@ -14,7 +10,8 @@ data_path = Path(__file__).parent.parent.absolute() / "data"
 
 
 def solve(path: str | Path):
-    data = [list(line) for line in utils.read_lines(path)]
+    data_raw = [list(line) for line in utils.read_lines(path)]
+    data = deepcopy(data_raw)
     _total_size = len(data) * len(data[0])
 
     visited = set()
@@ -58,47 +55,117 @@ def solve(path: str | Path):
 
     regions.extend(current_region.values())
     region_map = {tuple(region): 0 for region in regions}
-
     # Calculate perimiters
     for region in region_map:
         # We need to check if a region is _inside_ another region
 
-        min_row = min_col = math.inf
-        max_row = max_col = -math.inf
+        # min_row = min_col = math.inf
+        # max_row = max_col = -math.inf
+        # for row_i, col_i in region:
+        #     min_row = min(min_row, row_i)
+        #     min_col = min(min_col, col_i)
+        #     max_row = max(max_row, row_i)
+        #     max_col = max(max_col, col_i)
+
+        target_value = data_raw[region[0][0]][region[0][1]]
         for row_i, col_i in region:
-            min_row = min(min_row, row_i)
-            min_col = min(min_col, col_i)
-            max_row = max(max_row, row_i)
-            max_col = max(max_col, col_i)
+            if row_i in [0, len(data) - 1]:
+                region_map[region] += 1
+            if col_i in [0, len(data[0]) - 1]:
+                region_map[region] += 1
 
-        region_map[region] += _calculate_permiter(region)
+            for r_i, c_i in utils.get_adjacent(
+                row_i, col_i, matrix=data_raw, include_corners=False
+            ):
+                if data_raw[r_i][c_i] != target_value:
+                    region_map[region] += 1
 
-        for _region in region_map:
-            if _region == region:
-                continue
+        # Create matrix to fit the polygon, then flood-fill the perimiter!
 
-            if len(_region) < 8:
-                continue
+        # num_rows = int(max_row - min_row + 1)
+        # num_cols = int(max_col - min_col + 1)
 
-            polygon = _create_polygon(_region)
-            breakpoint()
-            res = [polygon.encloses_point(sympy.Point(*point)) for point in region]
-            print(_region)
-            print(region)
-            print(res)
-            print()
-            if all(res):
-                region_map[_region] += _calculate_permiter(region)
+        # matrix = [["."] * num_cols for _ in range(num_rows)]
 
+        # for row_i, col_i in region:
+        #     matrix[row_i - min_row][col_i - min_col] = "#"
+
+        # flood_fill(matrix)
+
+        # # Now, any remaining "." are other regions!!
+        # other_region_points = []
+        # for row_i, row in enumerate(matrix):
+        #     for col_i, col in enumerate(row):
+        #         if col == ".":
+        #             other_region_points.append((row_i, col_i))
+
+        # # Find the other regions and add their perimiter to the current
+        # counted_regions = []
+        # for point in other_region_points:
+        #     for _region in counted_regions:
+        #         if point in _region:
+        #             break
+        #     else:
+        #         # find the region it is actually in
+        #         for _region in region_map:
+        #             if point not in _region:
+        #                 continue
+
+        #             for row_i, col_i in _region:
+        #                 row_i -= min_row
+        #                 col_i -= min_col
+        #                 _val = matrix[row_i][col_i]
+
+        #                 for r_i, c_i in utils.get_adjacent(
+        #                     row_i, col_i, matrix=matrix, include_corners=False
+        #                 ):
+        #                     if matrix[r_i][c_i] != _val:
+        #                         region_map[region] += 1
+
+        #             counted_regions.append(_region)
+        #             break
+
+    _sum = 0
     for region, perimiter in region_map.items():
-        print(len(region), perimiter)
+        _sum += len(region) * perimiter
 
-    return sum(len(region) * perimiter for region, perimiter in region_map.items())
+    return _sum
 
 
-@cache
-def _create_polygon(points):
-    return sympy.Polygon(*points)
+def flood_fill(matrix: list[list[str]]) -> None:
+    num_rows = len(matrix)
+    num_cols = len(matrix[0])
+
+    perimiter = [
+        *[(0, j) for j in range(num_cols)],
+        *[(num_rows - 1, j) for j in range(num_cols)],
+        *[(i, 0) for i in range(num_rows)],
+        *[(i, num_cols - 1) for i in range(num_rows)],
+    ]
+
+    visited = set()
+    while perimiter:
+        (row_i, col_i) = node = perimiter.pop(-1)
+
+        if node in visited:
+            continue
+
+        if matrix[row_i][col_i] != ".":
+            continue
+
+        visited.add(node)
+        matrix[row_i][col_i] = "*"
+        for next_node in utils.get_adjacent(
+            row_i, col_i, matrix=matrix, include_corners=False
+        ):
+            if next_node in visited:
+                continue
+
+            perimiter.append(next_node)
+
+    for line in matrix:
+        print("".join(line))
+    print()
 
 
 @cache

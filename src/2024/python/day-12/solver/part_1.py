@@ -32,7 +32,7 @@ def solve(path: str | Path):
                 ...
 
             nodes = [node]
-            current_region = {data[node[0]][node[1]]: []}
+            current_region = {data[node[0]][node[1]]: set()}
 
         current = nodes.pop()
         row_i, col_i = current
@@ -42,7 +42,7 @@ def solve(path: str | Path):
             continue
         else:
             visited.add(current)
-            current_region[value].append(current)
+            current_region[value].add(current)
             data[row_i][col_i] = "."
 
         for n in utils.get_adjacent(*current, data, include_corners=False):
@@ -51,6 +51,12 @@ def solve(path: str | Path):
                 nodes.append(n)
 
     regions.extend(current_region.values())
+    region_map = {tuple(region): 0 for region in regions}
+
+    # Calculate perimiters
+    for region, value in region_map:
+        # We need to check if a region is _inside_ another region
+        ...
 
     return 0
 

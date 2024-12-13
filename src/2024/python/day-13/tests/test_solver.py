@@ -10,9 +10,9 @@ data_path = Path(__file__).parent.parent.absolute() / "data"
 # ------------------------------
 
 answer_example_1 = 480
-answer_example_2 = ...
+answer_example_2 = 480
 
-answer_part_1 = ...
+answer_part_1 = 39290
 answer_part_2 = ...
 
 # ------------------------------
@@ -27,7 +27,7 @@ def test_solve_1_run_example():
 
 
 def test_solve_2_run_example():
-    answer = part_2.solve(data_path / "example_2.txt")
+    answer = part_2.solve(data_path / "example_1.txt")
     if answer is None:
         assert True
     else:
@@ -44,7 +44,6 @@ def test_solve_2_run_input():
     assert part_2.solve(data_path / "input.txt") == answer_part_2
 
 
-@pytest.mark.skip()
 def test_solve_1_cleaned_example():
     assert cleaned.solve_1(data_path / "example_1.txt") == answer_example_1
 
@@ -54,7 +53,6 @@ def test_solve_2_cleaned_example():
     assert cleaned.solve_2(data_path / "example_2.txt") == answer_example_2
 
 
-@pytest.mark.skip()
 def test_solve_1_cleaned_input():
     assert cleaned.solve_1(data_path / "input.txt") == answer_part_1
 

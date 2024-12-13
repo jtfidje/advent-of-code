@@ -83,6 +83,7 @@ def a_star(machine) -> int | None:
             continue
 
         if (x, y) == prize:
+            print(len(visited))
             return cost
 
         visited.add(node)
@@ -92,5 +93,5 @@ def a_star(machine) -> int | None:
 
 
 if __name__ == "__main__":
-    answer = solve(Path(data_path, "input.txt"))
+    answer = solve(Path(data_path, "example_1.txt"))
     print(f"Problem 1: {answer}")

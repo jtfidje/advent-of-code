@@ -1,6 +1,6 @@
 # flake8: noqa: F401
-
 import re
+import time
 from functools import reduce
 from pathlib import Path
 
@@ -26,26 +26,29 @@ def solve(path: str | Path):
         width = 101
 
     for _ in range(height):
-        grid.append(["."] * width)
+        grid.append([0] * width)
 
-    positions = {(pr, pc): (vr, vc) for pc, pr, vc, vr in robots}
+    for _ in range(100):
+        for robot in robots:
+            pc, pr, vc, vr = robot
+            pr += vr
+            pc += vc
 
-    for pos, vel in positions.items():
-        vr = abs(vel[0] * 100)
-        vc = abs(vel[1] * 100)
+            if pr >= height:
+                pr = pr % height
+            elif pr < 0:
+                pr = height + pr
 
-        if vel[0] < 0:
-            vr *= -1
-        if vel[1] < 0:
-            vc *= -1
+            if pc >= width:
+                pc = pc % width
+            elif pc < 0:
+                pc = width + pc
 
-        pr = (pos[0] + vr) % height
-        pc = (pos[1] + vc) % width
+            robot[0] = pc
+            robot[1] = pr
 
-        if grid[pr][pc] == ".":
-            grid[pr][pc] = 1
-        else:
-            grid[pr][pc] += 1
+    for pc, pr, vc, vr in robots:
+        grid[pr][pc] += 1
 
     quadrants = [
         ((r, c) for r in range(0, height // 2) for c in range(0, width // 2)),
@@ -62,10 +65,7 @@ def solve(path: str | Path):
         ),
     ]
 
-    results = [
-        sum(grid[r][c] if grid[r][c] != "." else 0 for r, c in _range)
-        for _range in quadrants
-    ]
+    results = [sum(grid[r][c] for r, c in _range) for _range in quadrants]
 
     r, c = height // 2, width // 2
     for i in range(width):
@@ -73,7 +73,9 @@ def solve(path: str | Path):
     for i in range(height):
         grid[i][c] = " "
 
-    for line in grid:
+    for row in grid:
+        line = "".join(map(str, row))
+        line = line.replace("0", ".")
         print("".join(map(str, line)))
     return reduce(lambda x, y: x * y, results)
 
@@ -81,13 +83,3 @@ def solve(path: str | Path):
 if __name__ == "__main__":
     answer = solve(Path(data_path, "input.txt"))
     print(f"Problem 1: {answer}")
-
-
-"""
-  .  .  .  .  
-  .  .  .  .  
-  .  .  .  .  
-  .  .  .  .  
-  .  .  .  .  
-
-"""

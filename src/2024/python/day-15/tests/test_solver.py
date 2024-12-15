@@ -11,7 +11,7 @@ data_path = Path(__file__).parent.parent.absolute() / "data"
 
 answer_example_1_1 = 2028
 answer_example_1_2 = 10092
-answer_example_2_1 = 105
+answer_example_2_1 = 618
 answer_example_2_2 = 9021
 
 answer_part_1 = 1463512

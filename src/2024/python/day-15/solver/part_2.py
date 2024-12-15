@@ -37,17 +37,28 @@ def solve(path: str | Path):
         for col_i, col in enumerate(row)
         if col == "@"
     )
-    grid[current_pos[0]][current_pos[1]] = "."
-    while moves:
-        move = moves.pop(0)
-        velocity = move_map[move]
-        row_i, col_i = current_pos
-        row_j, col_j = next_pos = get_next_pos(current_pos, velocity)
 
-        if grid[row_j][col_j] == "#":
+    grid[current_pos[0]][current_pos[1]] = "."
+    num_moves = 0
+    while moves:
+        num_moves += 1
+        move = moves.pop(0)
+
+        if 21 < num_moves < 24:
+            grid[current_pos[0]][current_pos[1]] = "@"
+            print(move)
+            print_grid(grid)
+            print()
+            grid[current_pos[0]][current_pos[1]] = "."
+
+        velocity = move_map[move]
+        row_j, col_j = next_pos = get_next_pos(current_pos, velocity)
+        next_char = grid[row_j][col_j]
+
+        if next_char == "#":
             continue
 
-        if grid[row_j][col_j] == ".":
+        if next_char == ".":
             current_pos = next_pos
             continue
 
@@ -76,60 +87,66 @@ def solve(path: str | Path):
 
         # If however we're moving up or down, we need to check a window
         else:
-            all_windows = []
-            search_window = [next_pos]
-            match grid[row_j][col_j]:
+            match next_char:
                 case "[":
-                    search_window.append((next_pos[0], next_pos[1] + 1))
+                    boxes = [(next_pos, (row_j, col_j + 1))]
                 case "]":
-                    search_window.append((next_pos[0], next_pos[1] - 1))
+                    boxes = [((row_j, col_j - 1), next_pos)]
 
-            while True:
-                chars = [grid[r][c] for r, c in search_window]
+            visited = []
 
-                if "#" in chars:
-                    break
+            while boxes:
+                box = boxes.pop(0)
+                visited.append(box)
+                for point in box:
+                    next_r, next_c = next_point = get_next_pos(point, velocity)
 
-                all_windows.append(search_window)
+                    match grid[next_r][next_c]:
+                        case "#":
+                            break
 
-                if all(c == "." for c in chars):
-                    break
+                        case ".":
+                            continue
 
-                temp_r, temp_c = search_window[0]
-                if grid[temp_r][temp_c] == "]":
-                    # Increase window
-                    search_window.insert(
-                        0, (search_window[0][0], search_window[0][1] - 1)
-                    )
+                        case "[":
+                            new_box = (next_point, (next_r, next_c + 1))
 
-                temp_r, temp_c = search_window[-1]
-                if grid[temp_r][temp_c] == "[":
-                    # Increase_window
-                    search_window.insert(
-                        0, (search_window[0][0], search_window[0][1] + 1)
-                    )
+                        case "]":
+                            new_box = ((next_r, next_c - 1), next_point)
 
-                search_window = [get_next_pos(pos, velocity) for pos in search_window]
+                    if new_box in [*visited, *boxes]:
+                        continue
 
-            all_windows.reverse()
-            for i in range(1, len(all_windows)):
-                for r, c in all_windows[i - 1]:
-                    grid[r][c] = "."
+                    boxes.append(new_box)
+                else:
+                    # No breaks - go to next
+                    continue
 
-                for r, c in all_windows[i]:
+                # We only hit this if # - break out of while loop
+                break
+
+            else:
+                # No breaks - let's shift the boxes
+                for b1, b2 in visited[::-1]:
                     match move:
-                        case "^":
-                            grid[r - 1][c] = grid[r][c]
                         case "v":
-                            grid[r + 1][c] = grid[r][c]
+                            grid[b1[0] + 1][b1[1]] = grid[b1[0]][b1[1]]
+                            grid[b2[0] + 1][b2[1]] = grid[b2[0]][b2[1]]
+                        case "^":
+                            grid[b1[0] - 1][b1[1]] = grid[b1[0]][b1[1]]
+                            grid[b2[0] - 1][b2[1]] = grid[b2[0]][b2[1]]
+                    grid[b1[0]][b1[1]] = "."
+                    grid[b2[0]][b2[1]] = "."
 
-    grid[current_pos[0]][current_pos[1]] = "@"
-    print_grid(grid)
+                current_pos = next_pos
+
+    # grid[current_pos[0]][current_pos[1]] = "@"
+    # print_grid(grid)
     return sum(
         (row_i * 100) + col_i
         for row_i, row in enumerate(grid)
         for col_i, col in enumerate(row)
-        if col == "O"
+        if col == "["
     )
 
 
@@ -144,5 +161,5 @@ def get_next_pos(current, velocity):
 
 if __name__ == "__main__":
     # answer = solve(Path(data_path, "input.txt"))
-    answer = solve(Path(data_path, "example_test.txt"))
+    answer = solve(Path(data_path, "input.txt"))
     print(f"Problem 1: {answer}")

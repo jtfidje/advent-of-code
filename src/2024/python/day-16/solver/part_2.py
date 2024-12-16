@@ -1,5 +1,7 @@
 # flake8: noqa: F401
 import math
+from collections import defaultdict
+from copy import deepcopy
 from pathlib import Path
 from typing import Literal, Self
 
@@ -9,9 +11,9 @@ data_path = Path(__file__).parent.parent.absolute() / "data"
 
 DIRECTIONS: list[tuple[int, int, Literal["<", ">", "v", "^"]]] = [
     (-1, 0, "^"),
-    (0, 1, ">"),
     (1, 0, "v"),
     (0, -1, "<"),
+    (0, 1, ">"),
 ]
 
 
@@ -32,6 +34,12 @@ class Node:
         else:
             self.depth = 0
             self.direction_score = 0
+
+    def __repr__(self) -> str:
+        return f"Node {self.pos} {self.score}"
+
+    def __str__(self) -> str:
+        return self.__repr__()
 
     @property
     def score(self):
@@ -69,26 +77,32 @@ def solve(path: str | Path):
         if col == "E"
     )
 
-    visited: dict[tuple[int, int], Node] = {}
     nodes = [Node(pos=start_pos, direction=">", parent=None)]
-
-    best_nodes = []
+    visited: dict[tuple[int, int], int] = {}
+    unique_paths = set()
     best_score = math.inf
-
     while nodes:
-        # nodes.sort(key=lambda x: x.score)
+        nodes.sort(key=lambda node: node.score)
+
         node = nodes.pop(0)
 
         if node.pos == target_pos:
+            if node.score > best_score:
+                continue
+
             if node.score < best_score:
                 best_score = node.score
-                best_nodes = [node]
-            elif node.score == best_score:
-                best_nodes.append(node)
+                unique_paths = set()
+
+            unique_paths |= set(node.get_path())
+            # _maze = deepcopy(maze)
+            # for r, c in node.get_path():
+            #     _maze[r][c] = "O"
+            # print(node.score)
 
             continue
 
-        visited[node.pos] = node
+        visited[node.pos] = node.score
 
         for direction in DIRECTIONS:
             new_pos = (node.pos[0] + direction[0], node.pos[1] + direction[1])
@@ -99,27 +113,36 @@ def solve(path: str | Path):
 
             child = Node(pos=new_pos, direction=direction[2], parent=node)
 
+            # _maze = deepcopy(maze)
+            # for r, c in visited:
+            #     _maze[r][c] = "-"
+            # for r, c in node.get_path():
+            #     _maze[r][c] = "O"
+            # for n in nodes:
+            #     _maze[n.pos[0]][n.pos[1]] = "*"
+
+            # _maze[child.pos[0]][child.pos[1]] = "X"
+            # for line in _maze:
+            #     print("".join(line))
+
             # Increase direction score if they've turned
             if child.direction != node.direction:
                 child.direction_score += 1000
 
             # Check if we've been here before
-            if (_visited := visited.get(child.pos)) is not None:
-                if _visited.score < child.score:
+            if (_score := visited.get(child.pos)) is not None:
+                if _score + 1000 < child.score:
                     continue
 
-                if _visited.score > child.score:
-                    visited.pop(_visited.pos)
+                if _score > child.score:
+                    visited.pop(child.pos)
 
             nodes.append(child)
 
-    unique_positions = set()
-    for node in best_nodes:
-        unique_positions |= set(node.get_path())
-
-    return len(unique_positions)
+    return len(unique_paths)
 
 
 if __name__ == "__main__":
     answer = solve(Path(data_path, "input.txt"))
+    # answer = solve(Path(data_path, "example_2.txt"))
     print(f"Problem 2: {answer}")

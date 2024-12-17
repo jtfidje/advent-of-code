@@ -15,10 +15,14 @@ def solve(path: str | Path):
         map(int, re.search(r"Program: ((\d,?)+)", raw).groups()[0].split(","))  # type: ignore
     )
 
+    c = 0
     cores = 8
-    i = 100_000
+    i = 10_000
     while True:
-        inputs = [(a, program) for a in range(i, i + cores)]
+        inputs = [
+            (range(x + (x * i), (x + (x * i)) + i), program)
+            for x in range(c, cores + c)
+        ]
         with multiprocessing.Pool(cores) as pool:
             results = pool.map(solver, inputs)
 
@@ -27,13 +31,12 @@ def solve(path: str | Path):
                 print(res)
                 break
 
-        i += cores
+        c += cores
 
 
-def solver(inp: tuple[int, list[int]]) -> int | None:
-    register_a, program = inp
+def solver(inp: tuple[range, list[int]]) -> int | None:
+    reg_range, program = inp
 
-    register_a = register_a
     register_b = 0
     register_c = 0
 
@@ -48,56 +51,58 @@ def solver(inp: tuple[int, list[int]]) -> int | None:
         7: lambda: None,
     }
 
-    output = []
-    pointer = -2
-    increase_pointer = True
-    while True:
-        if increase_pointer:
-            pointer += 2
-        else:
-            increase_pointer = True
+    for i in reg_range:
+        register_a = i
+        output = []
+        pointer = -2
+        increase_pointer = True
+        while True:
+            if increase_pointer:
+                pointer += 2
+            else:
+                increase_pointer = True
 
-        if pointer >= len(program):
-            break
+            if pointer >= len(program):
+                break
 
-        opcode, operand = program[pointer], program[pointer + 1]
+            opcode, operand = program[pointer], program[pointer + 1]
 
-        match opcode:
-            case 0:
-                # "adv" Divide register_a by combo operand. save to register a
-                register_a = register_a // (2 ** combo_map[operand]())
+            match opcode:
+                case 0:
+                    # "adv" Divide register_a by combo operand. save to register a
+                    register_a = register_a // (2 ** combo_map[operand]())
 
-            case 1:
-                # "bxl" Bitwise XOR of register_b and literal operand save to register b
-                register_b = register_b ^ operand
+                case 1:
+                    # "bxl" Bitwise XOR of register_b and literal operand save to register b
+                    register_b = register_b ^ operand
 
-            case 2:
-                # "bst" combo operand mod 8 to reg b
-                register_b = combo_map[operand]() % 8
+                case 2:
+                    # "bst" combo operand mod 8 to reg b
+                    register_b = combo_map[operand]() % 8
 
-            case 3:
-                # "jnx" jump instruction pointer by operand of register_a != 0
-                if register_a == 0:
-                    continue
+                case 3:
+                    # "jnx" jump instruction pointer by operand of register_a != 0
+                    if register_a == 0:
+                        continue
 
-                # TODO: Jump instruction pointer
-                increase_pointer = False
-                pointer = operand
+                    # TODO: Jump instruction pointer
+                    increase_pointer = False
+                    pointer = operand
 
-            case 4:
-                register_b = register_c ^ register_b
+                case 4:
+                    register_b = register_c ^ register_b
 
-            case 5:
-                output.append(combo_map[operand]() % 8)
+                case 5:
+                    output.append(combo_map[operand]() % 8)
 
-            case 6:
-                register_b = register_a // (2 ** combo_map[operand]())
+                case 6:
+                    register_b = register_a // (2 ** combo_map[operand]())
 
-            case 7:
-                register_c = register_a // (2 ** combo_map[operand]())
+                case 7:
+                    register_c = register_a // (2 ** combo_map[operand]())
 
-        if ",".join(map(str, output)) == ",".join(map(str, program)):
-            return register_a
+            if ",".join(map(str, output)) == ",".join(map(str, program)):
+                return register_a
 
     return None
 

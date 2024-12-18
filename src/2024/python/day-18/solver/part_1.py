@@ -28,7 +28,12 @@ class Node:
         return self.__repr__()
 
 
-MOVES = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+MOVES = [
+    (1, 0),
+    (-1, 0),
+    (0, 1),
+    (0, -1),
+]
 
 
 def solve(path: str | Path):
@@ -47,7 +52,7 @@ def solve(path: str | Path):
     visited: dict[tuple[int, int], Node] = {}
     nodes: list[Node] = [Node(point=(0, 0))]
     while nodes:
-        nodes.sort(key=lambda n: n.h)
+        nodes.sort(key=lambda n: n.depth)
         node = nodes.pop(0)
 
         if node.point == target:
@@ -67,10 +72,10 @@ def solve(path: str | Path):
                 continue
 
             child = Node(point=next_point, parent=node)
-            child.calc_h(target)
+            # child.calc_h(target)
 
             if _visited := visited.get(child.point):
-                if _visited.h <= child.h:
+                if _visited.depth <= child.depth:
                     continue
 
                 visited.pop(child.point)

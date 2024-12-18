@@ -44,22 +44,20 @@ def solve(path: str | Path):
 
     corrupted = set(points[:num_bytes])
 
-    visited: dict[tuple[int, int], int | float] = {}
-    nodes: list[tuple[int, int, int | float]] = [(0, 0, math.inf)]
-
+    visited: dict[tuple[int, int], Node] = {}
+    nodes: list[Node] = [Node(point=(0, 0))]
     while nodes:
-        nodes.sort(key=lambda n: n[2])
+        nodes.sort(key=lambda n: n.h)
         node = nodes.pop(0)
-        row_i, col_i = current_point = (node[0], node[1])
 
-        if (node[0], node[1]) == target:
-            return node[2]
+        if node.point == target:
+            return node.depth
 
-        visited[current_point] = node[2]
+        visited[node.point] = node
         for move in MOVES:
             next_point: tuple[int, int] = (
-                row_i + move[0],
-                col_i + move[1],
+                node.point[0] + move[0],
+                node.point[1] + move[1],
             )
 
             if utils.out_of_bounds(*next_point, grid):
@@ -68,22 +66,16 @@ def solve(path: str | Path):
             if next_point in corrupted:
                 continue
 
-            child = (*next_point, node[2] + 1)
-            # child.calc_h(target)
+            child = Node(point=next_point, parent=node)
+            child.calc_h(target)
 
-            if _visited := visited.get(next_point):
-                if _visited <= child[2]:
+            if _visited := visited.get(child.point):
+                if _visited.h <= child.h:
                     continue
 
-                visited.pop(next_point)
+                visited.pop(child.point)
 
-            for i, n in enumerate(nodes):
-                if (n[0], n[1]) == next_point:
-                    if n[2] > child[2]:
-                        nodes.pop(i)
-                        nodes.append(child)
-            else:
-                nodes.append(child)
+            nodes.append(child)
 
     return "Error"
 

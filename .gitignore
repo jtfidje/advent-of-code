@@ -1,0 +1,19 @@
+# Misc.
+.env
+.ruff_cache/
+
+# Python
+.hypothesis/
+.pytest_cache/
+__pycache__/
+.venv
+*.egg-info
+
+# Rust
+target/
+
+# Don't commit data input files
+data/
+input.txt
+example*.txt
+!src/aoc_template/templates/data/*.txt

@@ -65,7 +65,9 @@ if not project_path.exists():
 
     # Write puzzle input to file
     logger.info("Writing puzzle input to file")
-    with open(project_path / "data" / "input.txt", "w") as f:
+    data_path = project_path / "data"
+    data_path.mkdir(exist_ok=True)
+    with open(data_path / "input.txt", "w") as f:
         f.write(puzzle_input[:-1])  # Remove trailing newline
 
     # Replace placeholder vars in README.md

@@ -29,7 +29,6 @@ def solve(path: str | Path):
     return counter
 
 
-
 if __name__ == "__main__":
     answer = solve(DATA_PATH / "input.txt")
     print(f"Problem 1: {answer}")

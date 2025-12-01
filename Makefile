@@ -6,3 +6,11 @@ clean:
 	find . -type d -name ".ruff_cache" -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
 	find . -type f -name ".coverage" -delete
+
+lint:
+	uv run ruff check src puzzles
+	uv run ty check src puzzles
+
+format:
+	uv run ruff format src puzzles
+	uv run ruff check --fix src puzzles

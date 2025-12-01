@@ -19,7 +19,7 @@ def solve(path: str | Path):
                 number = int(line[1:])
 
                 x = (dial + number) // 100
-                
+
                 counter += x
 
                 dial = (dial + number) % 100
@@ -27,7 +27,7 @@ def solve(path: str | Path):
                 number = int(line[1:])
 
                 x = (((dial - number) * -1) + 100) // 100
-                
+
                 if dial == 0 and number > 0:
                     x -= 1
 
@@ -36,7 +36,6 @@ def solve(path: str | Path):
                 dial = (dial - number) % 100
 
     return counter
-
 
 
 if __name__ == "__main__":

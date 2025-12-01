@@ -6,7 +6,6 @@ from aoc_2015_01 import DATA_PATH
 
 def solve_1(path: Path):
     return sum([1 if char == "(" else -1 for char in read_data(path)])
-    
 
 
 def solve_2(path: Path):

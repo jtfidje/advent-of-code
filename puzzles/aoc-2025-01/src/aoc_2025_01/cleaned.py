@@ -18,10 +18,10 @@ def solve_1(path: Path):
                 dial = (dial + rotation) % 100
 
         password += dial == 0
-    
+
     return password
-        
-    
+
+
 def solve_2(path: Path):
     data = map(lambda line: (line[0], int(line[1:])), read_lines(path))
 
@@ -37,9 +37,9 @@ def solve_2(path: Path):
             case "L":
                 value = dial - rotation
                 password += (((value * -1) + 100) // 100) - int(dial == 0)
-        
+
         dial = value % 100  # type: ignore
-    
+
     return password
 
 

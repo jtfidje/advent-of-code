@@ -1,7 +1,7 @@
 import json
 import re
 from pathlib import Path
-from typing import Generator
+from collections.abc import Generator, Sequence
 
 
 def json_print(obj: dict | list) -> None:
@@ -72,7 +72,7 @@ def read_all_numbers(path: str | Path) -> list[list[int]]:
 
 
 def sliding_window(
-    array: list,
+    array: Sequence,
     window_size: int,
     step: int | None = None,
     include_remainder: bool = False,

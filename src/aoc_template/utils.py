@@ -156,8 +156,8 @@ def start_vscode(project_path: Path):
             (
                 f"code --reuse-window "
                 f"{project_path} "
-                f"{project_path}/data/example_1.txt "
-                f"{project_path}/data/example_2.txt "
+                f"{project_path}/data/example_1_1.txt "
+                f"{project_path}/data/example_2_1.txt "
                 f"{project_path}/src/{project_path.stem.replace('-', '_')}/test_solutions.py "  # noqa: E501
                 f"{project_path}/src/{project_path.stem.replace('-', '_')}/part_1.py "
                 f"{project_path}/src/{project_path.stem.replace('-', '_')}/part_2.py "

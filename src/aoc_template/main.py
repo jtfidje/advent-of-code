@@ -68,7 +68,7 @@ if not project_path.exists():
     data_path = project_path / "data"
     data_path.mkdir(exist_ok=True)
     with open(data_path / "input.txt", "w") as f:
-        f.write(puzzle_input[:-1])  # Remove trailing newline
+        f.write(puzzle_input)
 
     # Replace placeholder vars in README.md
     logger.info("Replacing placeholder vars in README.md")

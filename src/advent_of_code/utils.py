@@ -38,9 +38,7 @@ def read_lines(path: str | Path) -> list[str]:
     Returns:
         list[str]: A list of strings, each representing a line from the file.
     """
-    with open(path, "r") as f:
-        lines = [line.strip() for line in f.readlines()]
-        return lines
+    return read_data(path).splitlines()
 
 
 def read_numbers(path: str | Path) -> list[int]:
@@ -53,9 +51,8 @@ def read_numbers(path: str | Path) -> list[int]:
     Returns:
         list[int]: A list of integers read from the file.
     """
-    with open(path, "r") as f:
-        lines = [line.strip() for line in f.readlines()]
-        return list(map(int, lines))
+    lines = read_lines(path)
+    return list(map(int, lines))
 
 
 def read_all_numbers(path: str | Path) -> list[list[int]]:
@@ -68,8 +65,8 @@ def read_all_numbers(path: str | Path) -> list[list[int]]:
     Returns:
         list[list[int]]: A list of lists of integers read from each line of the file.
     """
-    with open(path, "r") as f:
-        data = [re.findall(r"(-?\d+)", line) for line in f.readlines()]
+    lines = read_lines(path)
+    data = [re.findall(r"(-?\d+)", line) for line in lines]
     data = [list(map(int, line)) for line in data]
     return data
 

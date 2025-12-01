@@ -6,6 +6,7 @@ requires-python = ">=3.14"
 members = [
     "advent-of-code",
     "aoc-2015-01",
+    "aoc-2015-02",
     "aoc-2024-01",
     "aoc-2025-01",
     "aoc-template",
@@ -60,6 +61,11 @@ wheels = [
 name = "aoc-2015-01"
 version = "0.1.0"
 source = { editable = "puzzles/aoc-2015-01" }
+
+[[package]]
+name = "aoc-2015-02"
+version = "0.1.0"
+source = { editable = "puzzles/aoc-2015-02" }
 
 [[package]]
 name = "aoc-2024-01"

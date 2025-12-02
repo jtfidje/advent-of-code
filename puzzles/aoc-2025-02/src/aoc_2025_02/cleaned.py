@@ -5,17 +5,20 @@ from advent_of_code.utils import read_data
 from aoc_2025_02 import DATA_PATH
 
 
-def solve_1(path: Path):
+def parse_input(path: Path):
     data = read_data(path)
-    range_limits = map(
-        lambda r: (int(r[1]), int(r[2]) + 1), re.findall(r"((\d+)-(\d+))", data)
-    )
+    return map(lambda r: (int(r[0]), int(r[1]) + 1), re.findall(r"(\d+)-(\d+)", data))
+
+
+def solve_1(path: Path):
+    range_limits = parse_input(path)
 
     ids = ((str(n), n) for limits in range_limits for n in range(*limits))
 
     result = 0
     for str_id, int_id in ids:
         n = len(str_id) // 2
+
         x, y = str_id[n:], str_id[:n]
 
         if x == y:
@@ -26,10 +29,7 @@ def solve_1(path: Path):
 
 
 def solve_2(path: Path):
-    data = read_data(path)
-    range_limits = map(
-        lambda r: (int(r[1]), int(r[2]) + 1), re.findall(r"((\d+)-(\d+))", data)
-    )
+    range_limits = parse_input(path)
 
     ids = ((str(n), n) for limits in range_limits for n in range(*limits))
     result = 0

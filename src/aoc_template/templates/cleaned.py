@@ -2,15 +2,15 @@ from pathlib import Path
 
 from __PKG__ import DATA_PATH
 
-from advent_of_code.utils import read_lines
+from advent_of_code import utils
 
 
 def solve_1(path: Path):
-    data = read_lines(path)
+    data = utils.read_lines(path)
 
 
 def solve_2(path: Path):
-    data = read_lines(path)
+    data = utils.read_lines(path)
 
 
 if __name__ == "__main__":

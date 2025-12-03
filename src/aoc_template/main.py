@@ -42,8 +42,7 @@ if not project_path.exists():
         shell=True,
     )
 
-    # Copy data and README
-    subprocess.run(f"cp -r {template_path}/data {project_path}/.", shell=True)
+    # Copy README
     subprocess.run(f"cp {template_path}/README.rst {project_path}/.", shell=True)
 
     # Inject package name into absolute import placeholder

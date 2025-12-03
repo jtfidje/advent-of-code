@@ -14,6 +14,7 @@ members = [
     "aoc-2015-07",
     "aoc-2015-08",
     "aoc-2015-09",
+    "aoc-2015-10",
     "aoc-2025-01",
     "aoc-2025-02",
     "aoc-2025-03",
@@ -109,6 +110,11 @@ source = { editable = "puzzles/aoc-2015-08" }
 name = "aoc-2015-09"
 version = "0.1.0"
 source = { editable = "puzzles/aoc-2015-09" }
+
+[[package]]
+name = "aoc-2015-10"
+version = "0.1.0"
+source = { editable = "puzzles/aoc-2015-10" }
 
 [[package]]
 name = "aoc-2025-01"

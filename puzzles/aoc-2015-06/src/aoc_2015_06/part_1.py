@@ -19,10 +19,10 @@ def solve(path: str | Path):
 
                 if line.startswith("turn on"):
                     grid[pos] = True
-                
+
                 elif line.startswith("turn off"):
                     grid[pos] = False
-                
+
                 else:
                     grid[pos] = not grid[pos]
 

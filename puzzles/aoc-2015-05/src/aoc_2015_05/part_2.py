@@ -12,8 +12,10 @@ def solve(path: str | Path):
     count = 0
     for line in data:
         found = False
-        for i, pattern in enumerate(utils.sliding_window(line[:-2], window_size=2, step=1)):  # noqa: E501
-            for window in utils.sliding_window(line[i + 2:], window_size=2, step=1):
+        for i, pattern in enumerate(
+            utils.sliding_window(line[:-2], window_size=2, step=1)
+        ):  # noqa: E501
+            for window in utils.sliding_window(line[i + 2 :], window_size=2, step=1):
                 if pattern == window:
                     found = True
                     break

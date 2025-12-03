@@ -4,6 +4,7 @@ from pathlib import Path
 from advent_of_code.utils import read_data
 from aoc_2015_04 import DATA_PATH
 
+
 def solver(key: str, target: str) -> int:
     counter = 1
     while True:
@@ -12,16 +13,15 @@ def solver(key: str, target: str) -> int:
             return counter
         counter += 1
 
+
 def solve_1(path: Path):
     data = read_data(path)
     return solver(key=data, target="00000")
 
 
-
 def solve_2(path: Path):
     data = read_data(path)
     return solver(key=data, target="000000")
-    
 
 
 if __name__ == "__main__":

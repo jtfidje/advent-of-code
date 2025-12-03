@@ -11,7 +11,7 @@ def solve(path: str | Path):
     result = 0
     for line in data:
         max_ = 0
-        for i in range(len(line)-1):
+        for i in range(len(line) - 1):
             for j in range(i + 1, len(line)):
                 n = int(line[i] + line[j])
                 max_ = max(max_, n)

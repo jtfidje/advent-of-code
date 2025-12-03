@@ -7,6 +7,7 @@ from pathlib import Path
 from advent_of_code import utils
 from aoc_2025_02 import DATA_PATH
 
+
 def solve(path: str | Path):
     data = utils.read_data(path)
     ranges = data.split(",")
@@ -25,10 +26,6 @@ def solve(path: str | Path):
                 continue
 
     return sum(invalid_ids)
-
-
-
-
 
 
 if __name__ == "__main__":

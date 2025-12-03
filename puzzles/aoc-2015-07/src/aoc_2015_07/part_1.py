@@ -13,21 +13,24 @@ OP_MAP = {
     "RSHIFT": lambda x, y: x >> y,
 }
 
+
 def solve(path: str | Path):
     data = utils.read_lines(path)
     circuit = {}
 
     connections = []
     for line in data:
-        if (res := re.search(r"(.+) (AND|LSHIFT|RSHIFT|OR) (.+) -> (.+)", line)):
+        if res := re.search(r"(.+) (AND|LSHIFT|RSHIFT|OR) (.+) -> (.+)", line):
             x, op, y, out = res.groups()
 
-            connections.append({
-                "op": op,
-                "out": out,
-                "x": x,
-                "y": y,
-            })
+            connections.append(
+                {
+                    "op": op,
+                    "out": out,
+                    "x": x,
+                    "y": y,
+                }
+            )
         else:
             x, out = re.search(r"^(?:NOT )?(\w+|\d+) -> (.+)$", line).groups()  # type: ignore
             if line.startswith("NOT"):
@@ -35,11 +38,7 @@ def solve(path: str | Path):
             else:
                 op = "SET"
 
-            connections.append({
-                "op": op,
-                "out": out,
-                "x": x
-            })
+            connections.append({"op": op, "out": out, "x": x})
 
     while connections:
         con = connections.pop(0)

@@ -19,18 +19,14 @@ def solve(path: str | Path):
             n = len(s) // 2
             for j in range(1, n + 1):
                 windows = [
-                    window for window in utils.sliding_window(
-                        s,
-                        window_size=j,
-                        step=j,
-                        include_remainder=True
+                    window
+                    for window in utils.sliding_window(
+                        s, window_size=j, step=j, include_remainder=True
                     )
                 ]
                 if len(set(windows)) == 1:
                     invalid_ids.append(i)
-                    break 
-
-            
+                    break
 
     return sum(invalid_ids)
 

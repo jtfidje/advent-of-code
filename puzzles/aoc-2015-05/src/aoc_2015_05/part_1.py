@@ -34,8 +34,6 @@ def solve(path: str | Path):
 
     return count
 
-        
-
 
 if __name__ == "__main__":
     answer = solve(DATA_PATH / "input.txt")

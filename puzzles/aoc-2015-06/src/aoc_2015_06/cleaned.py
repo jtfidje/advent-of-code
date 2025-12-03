@@ -7,6 +7,7 @@ from aoc_2015_06 import DATA_PATH
 
 pattern = r"(.+) (\d+),(\d+) through (\d+),(\d+)"
 
+
 def solve_1(path: Path):
     grid = defaultdict(bool)
 
@@ -21,10 +22,10 @@ def solve_1(path: Path):
                 match op:
                     case "turn on":
                         grid[pos] = True
-                    
+
                     case "turn off":
                         grid[pos] = False
-                    
+
                     case "toggle":
                         grid[pos] = not grid[pos]
 
@@ -45,10 +46,10 @@ def solve_2(path: Path):
                 match op:
                     case "turn on":
                         grid[pos] += 1
-                    
+
                     case "turn off":
-                        grid[pos] = max(0, grid[pos] -1)
-                    
+                        grid[pos] = max(0, grid[pos] - 1)
+
                     case "toggle":
                         grid[pos] += 2
 

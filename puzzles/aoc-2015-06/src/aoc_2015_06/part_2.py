@@ -20,11 +20,11 @@ def solve(path: str | Path):
 
                 if line.startswith("turn on"):
                     grid[pos] += 1
-                
+
                 elif line.startswith("turn off"):
                     grid[pos] -= 1
                     grid[pos] = max(0, grid[pos])
-                
+
                 else:
                     grid[pos] += 2
 

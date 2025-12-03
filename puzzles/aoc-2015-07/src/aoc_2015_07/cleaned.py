@@ -14,6 +14,7 @@ OP_MAP = {
     "RSHIFT": lambda x, y: x >> y,
 }
 
+
 @dataclass
 class Connection:
     op: str
@@ -21,12 +22,13 @@ class Connection:
     x: str
     y: str | None
 
+
 def get_connections(path: str | Path) -> list[Connection]:
     data = read_lines(path)
 
     connections = []
     for line in data:
-        if (res := re.search(r"(.+) (AND|LSHIFT|RSHIFT|OR) (.+) -> (.+)", line)):
+        if res := re.search(r"(.+) (AND|LSHIFT|RSHIFT|OR) (.+) -> (.+)", line):
             x, op, y, out = res.groups()
         else:
             x, out = re.search(r"^(?:NOT )?(\w+|\d+) -> (.+)$", line).groups()  # type: ignore
@@ -38,8 +40,9 @@ def get_connections(path: str | Path) -> list[Connection]:
             y = None
 
         connections.append(Connection(op, out, x, y))
-    
+
     return connections
+
 
 def wire_circuit(connections: list[Connection]):
     circuit: dict[str, int] = {}
@@ -56,8 +59,9 @@ def wire_circuit(connections: list[Connection]):
                 circuit[con.out] = OP_MAP[con.op](x)
         except ValueError:
             connections.append(con)
-    
+
     return circuit
+
 
 def solve_1(path: Path):
     circuit = wire_circuit(connections=get_connections(path))

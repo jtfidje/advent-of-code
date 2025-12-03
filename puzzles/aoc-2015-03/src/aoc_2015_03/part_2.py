@@ -11,7 +11,7 @@ def solve(path: str | Path):
 
     santa = [(0, 0), (0, 0)]
     houses = {(0, 0): None}
-    
+
     for i, char in enumerate(data):
         x, y = santa[i % 2]
 

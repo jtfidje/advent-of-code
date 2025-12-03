@@ -12,6 +12,7 @@ answer_part_2 = 2341
 
 # ------------------------------
 
+
 @pytest.mark.parametrize("i", range(len(answers_example_1)))
 def test_solve_1_run_example(i: int):
     answer = part_1.solve(DATA_PATH / f"example_1_{i + 1}.txt")
@@ -19,6 +20,7 @@ def test_solve_1_run_example(i: int):
         assert True
     else:
         assert answer == answers_example_1[i]
+
 
 @pytest.mark.parametrize("i", range(len(answers_example_2)))
 def test_solve_2_run_example(i: int):

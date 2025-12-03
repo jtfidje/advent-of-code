@@ -6,10 +6,11 @@ from aoc_2025_03 import DATA_PATH
 
 DIGITS = sorted(string.digits, reverse=True)
 
+
 def worker(line: str, batteries: str, size: int) -> str:
     if not line:
         return ""
-    
+
     for digit in DIGITS:
         for i, char in enumerate(line):
             if char == digit:
@@ -21,7 +22,7 @@ def worker(line: str, batteries: str, size: int) -> str:
         if len(batteries_) == size:
             return batteries_
 
-        batteries_ = worker(line[i + 1:], batteries_, size)
+        batteries_ = worker(line[i + 1 :], batteries_, size)
         if not batteries_:
             continue
 

@@ -6,10 +6,11 @@ from pathlib import Path
 from advent_of_code import utils
 from aoc_2025_03 import DATA_PATH
 
+
 def worker(line: str, batteries: str) -> str | None:
     if not line:
         return None
-    
+
     for digit in sorted(string.digits, reverse=True):
         for i, char in enumerate(line):
             if char == digit:
@@ -21,7 +22,7 @@ def worker(line: str, batteries: str) -> str | None:
         if len(batteries_) == 12:
             return batteries_
 
-        res = worker(line[i + 1:], batteries_)
+        res = worker(line[i + 1 :], batteries_)
         if res is None:
             continue
 
@@ -33,7 +34,7 @@ def worker(line: str, batteries: str) -> str | None:
 def solve(path: str | Path):
     data = utils.read_lines(path)
     result = 0
-    
+
     for line in data:
         res = worker(line, "")
         result += int(res)  # type: ignore

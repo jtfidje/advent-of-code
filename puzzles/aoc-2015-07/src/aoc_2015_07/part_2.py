@@ -14,20 +14,23 @@ OP_MAP = {
     "RSHIFT": lambda x, y: x >> y,
 }
 
+
 def get_connections(path: str | Path) -> list[dict[str, str]]:
     data = utils.read_lines(path)
 
     connections = []
     for line in data:
-        if (res := re.search(r"(.+) (AND|LSHIFT|RSHIFT|OR) (.+) -> (.+)", line)):
+        if res := re.search(r"(.+) (AND|LSHIFT|RSHIFT|OR) (.+) -> (.+)", line):
             x, op, y, out = res.groups()
 
-            connections.append({
-                "op": op,
-                "out": out,
-                "x": x,
-                "y": y,
-            })
+            connections.append(
+                {
+                    "op": op,
+                    "out": out,
+                    "x": x,
+                    "y": y,
+                }
+            )
         else:
             x, out = re.search(r"^(?:NOT )?(\w+|\d+) -> (.+)$", line).groups()  # type: ignore
             if line.startswith("NOT"):
@@ -35,13 +38,10 @@ def get_connections(path: str | Path) -> list[dict[str, str]]:
             else:
                 op = "SET"
 
-            connections.append({
-                "op": op,
-                "out": out,
-                "x": x
-            })
-    
+            connections.append({"op": op, "out": out, "x": x})
+
     return connections
+
 
 def wire_circuit(connections: list[dict[str, str]]):
     circuit: dict[str, int] = {}
@@ -81,8 +81,9 @@ def wire_circuit(connections: list[dict[str, str]]):
                     continue
 
                 circuit[con["out"]] = OP_MAP[con["op"]](x, y)
-    
+
     return circuit
+
 
 def solve(path: str | Path):
     circuit = wire_circuit(connections=get_connections(path))
@@ -97,7 +98,6 @@ def solve(path: str | Path):
     circuit = wire_circuit(connections=connections)  # noqa: E501
 
     return circuit["a"]
-
 
 
 if __name__ == "__main__":

@@ -1,7 +1,19 @@
+from collections.abc import Sequence
 from pathlib import Path
 
 from advent_of_code import utils
 from aoc_2025_04 import DATA_PATH
+
+
+def find_positions(grid: Sequence[Sequence[str]]) -> set[tuple[int, int]]:
+    positions = set()
+    for x, row in enumerate(grid):
+        for y, value in enumerate(row):
+            if value == "@":
+                positions.add((x, y))
+
+    return positions
+
 
 def solve_1(path: str | Path):
     data = utils.read_lines(path)
@@ -10,8 +22,8 @@ def solve_1(path: str | Path):
     for x in range(len(data)):
         for y in range(len(data[0])):
             if data[x][y] != "@":
-                    continue
-            
+                continue
+
             box = utils.get_adjacent(
                 x, y, data, include_corners=True, return_values=True
             )
@@ -22,24 +34,23 @@ def solve_1(path: str | Path):
 
 def solve_2(path: str | Path):
     data = [list(line) for line in utils.read_lines(path)]
+    positions = find_positions(data)
 
     result = 0
     repeat = True
     while repeat:
         repeat = False
-        for x in range(0, len(data)):
-            for y in range(0, len(data[0])):
-                if data[x][y] != "@":
-                    continue
+        for pos in list(positions):
+            x, y = pos
+            box = utils.get_adjacent(
+                x, y, data, include_corners=True, return_values=True
+            )
 
-                box = utils.get_adjacent(
-                    x, y, data, include_corners=True, return_values=True
-                )
-                
-                if box.count("@") < 4:
-                    repeat = True
-                    data[x][y] = "."
-                    result += 1
+            if box.count("@") < 4:
+                repeat = True
+                data[x][y] = "."
+                positions.remove((x, y))
+                result += 1
 
     return result
 

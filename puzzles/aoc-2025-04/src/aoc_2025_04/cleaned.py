@@ -1,18 +1,7 @@
-from collections.abc import Sequence
 from pathlib import Path
 
 from advent_of_code import utils
 from aoc_2025_04 import DATA_PATH
-
-
-def find_positions(grid: Sequence[Sequence[str]]) -> set[tuple[int, int]]:
-    positions = set()
-    for x, row in enumerate(grid):
-        for y, value in enumerate(row):
-            if value == "@":
-                positions.add((x, y))
-
-    return positions
 
 
 def solve_1(path: str | Path):
@@ -34,7 +23,11 @@ def solve_1(path: str | Path):
 
 def solve_2(path: str | Path):
     data = [list(line) for line in utils.read_lines(path)]
-    positions = find_positions(data)
+    positions = set()
+    for x, row in enumerate(data):
+        for y, value in enumerate(row):
+            if value == "@":
+                positions.add((x, y))
 
     result = 0
     repeat = True

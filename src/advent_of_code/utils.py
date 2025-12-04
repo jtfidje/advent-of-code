@@ -1,6 +1,7 @@
 import json
 import re
 from pathlib import Path
+from typing import overload, Literal
 from collections.abc import Generator, Sequence
 
 
@@ -121,27 +122,54 @@ def out_of_bounds(row: int, col: int, matrix: list[list]) -> bool:
     return False
 
 
-def get_adjacent(
+@overload
+def get_adjacent[T](
     row: int,
     col: int,
-    matrix: list[list],
-    width: int = 1,
-    height: int = 1,
-    include_corners: bool = True,
-) -> set[tuple[int, int]]:
+    matrix: Sequence[Sequence[T]],
+    width: int = ...,
+    height: int = ...,
+    include_corners: bool = ...,
+    *,
+    return_values: Literal[True]
+) -> list[T]: ...
+
+@overload
+def get_adjacent[T](
+    row: int,
+    col: int,
+    matrix: Sequence[Sequence[T]],
+    width: int = ...,
+    height: int = ...,
+    include_corners: bool = ...,
+    *,
+    return_values: Literal[False] = ...
+) -> set[tuple[int, int]]: ...
+
+def get_adjacent(
+    row,
+    col,
+    matrix,
+    width=1,
+    height=1,
+    include_corners=True,
+    return_values=False
+):
     """
     Get adjacent positions in a matrix for a given area.
 
     Args:
         row (int): Starting row of the area.
         col (int): Starting column of the area.
-        matrix (list[list]): The 2D matrix.
+        matrix (Sequence[Sequence[T]]): The 2D matrix.
         width (int, optional): Width of the area. Defaults to 1.
         height (int, optional): Height of the area. Defaults to 1.
         include_corners (bool, optional): Include corner positions. Defaults to True.
+        return_values (bool, optional): If True, return values will contain the values
+          at each position instead of the coordinates.
 
     Returns:
-        set[tuple[int, int]]: Set of adjacent positions.
+        set[tuple[int, int]] | list[T]: Set of adjacent positions or values.
 
     Note:
         We use sets and tuples in this function for improved performance.
@@ -176,5 +204,8 @@ def get_adjacent(
                 continue
 
             adjacent.add(position)
+
+    if return_values:
+        return [matrix[x][y] for x, y in adjacent]
 
     return adjacent

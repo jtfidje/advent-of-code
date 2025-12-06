@@ -12,7 +12,7 @@ def solver(seq: str, iterations: int) -> int:
             group = match.group()
             new_seq += str(len(group)) + group[0]
         seq = new_seq
-    
+
     return len(seq)
 
 

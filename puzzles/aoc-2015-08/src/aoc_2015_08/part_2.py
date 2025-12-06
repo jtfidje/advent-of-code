@@ -12,13 +12,10 @@ def solve(path: str | Path):
     counter = 0
 
     for line in data:
-        mem_str = line.replace("\"", "__Q__").replace("\\", "__B__")
+        mem_str = line.replace('"', "__Q__").replace("\\", "__B__")
         mem_str = re.sub(r"(\\x[\da-f]{2})", "\\\1", mem_str)
 
-        mem_str = (
-            mem_str.replace("__Q__", "\\\"")
-            .replace("__B__", "\\\\")
-        )
+        mem_str = mem_str.replace("__Q__", '\\"').replace("__B__", "\\\\")
 
         mem_str = f'"{mem_str}"'
 

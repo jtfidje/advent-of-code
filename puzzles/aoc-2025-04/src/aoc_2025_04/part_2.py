@@ -5,9 +5,11 @@ from pathlib import Path
 from advent_of_code import utils
 from aoc_2025_04 import DATA_PATH
 
+
 def print_grid(data):
     for row in data:
         print(" ".join(row))
+
 
 def solve(path: str | Path):
     data = utils.read_lines(path)
@@ -26,14 +28,12 @@ def solve(path: str | Path):
                 if Counter(values).get("@", 0) < 4:
                     to_remove.append((x, y))
                     result += 1
-                
-        
+
         if not to_remove:
             break
-        
+
         for x, y in to_remove:
             data[x][y] = "x"
-
 
     return result
 

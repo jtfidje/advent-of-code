@@ -13,7 +13,7 @@ def solve(path: str | Path):
 
     for line in data:
         mem_str = line[1:-1]
-        mem_str = mem_str.replace("\\\\", "X").replace("\\\"", "X")
+        mem_str = mem_str.replace("\\\\", "X").replace('\\"', "X")
         mem_str = re.sub(r"\\x[\da-f]{2}", "X", mem_str)
 
         counter += len(line) - len(mem_str)

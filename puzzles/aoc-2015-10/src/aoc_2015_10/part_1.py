@@ -15,9 +15,8 @@ def solve(path: str | Path):
             group = match.group()
             new_data += str(len(group)) + group[0]
         data = new_data
-    
+
     return len(data)
-        
 
 
 if __name__ == "__main__":

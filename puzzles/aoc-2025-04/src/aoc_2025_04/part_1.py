@@ -20,9 +20,6 @@ def solve(path: str | Path):
     return result
 
 
-
-
-
 if __name__ == "__main__":
     answer = solve(DATA_PATH / "input.txt")
     print(f"Problem 1: {answer}")

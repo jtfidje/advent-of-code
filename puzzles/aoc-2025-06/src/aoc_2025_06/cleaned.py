@@ -18,17 +18,17 @@ def solve_1(path: Path):
 
 def solve_2(path: Path):
     data = utils.read_data(path).splitlines()
-    
+
     number_lines = [line[::-1] for line in data[:-1]]
     operators = re.findall(r"(\S)", data[-1])[::-1]
-    
+
     result = 0
     numbers, operator = [], operators.pop(0)
     for numbers_ in zip(*number_lines):
         if not all(num == " " for num in numbers_):
             numbers.append("".join(numbers_))
             continue
-        
+
         result += eval(operator.join(numbers))
         numbers, operator = [], operators.pop(0)
     else:

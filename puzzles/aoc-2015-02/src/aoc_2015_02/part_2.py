@@ -7,7 +7,7 @@ from aoc_2015_02 import DATA_PATH
 
 
 def solve(path: str | Path):
-    data = utils.read_all_numbers(path)
+    data = utils.read_line_numbers(path)
 
     result = 0
     for line in data:

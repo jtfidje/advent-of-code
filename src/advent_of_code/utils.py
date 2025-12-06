@@ -1,16 +1,16 @@
 import json
 import re
-from collections.abc import Generator, Sequence
+from collections.abc import Iterator, Sequence
 from pathlib import Path
-from typing import Literal, overload
+from typing import Any, Literal, overload
 
 
 def json_print(obj: dict | list) -> None:
     """
     Print a JSON-formatted representation of the given object with indentation.
 
-    Args:
-        obj (dict | list): The object to be printed as JSON.
+    :param obj: The object to be printed as JSON.
+    :type obj: dict | list
     """
     print(json.dumps(obj, indent=4))
 
@@ -19,11 +19,10 @@ def read_data(path: str | Path) -> str:
     """
     Read and return the contents of a file as a string.
 
-    Args:
-        path (str): The path to the file to be read.
-
-    Returns:
-        str: The contents of the file, with leading and trailing whitespace removed.
+    :param path: The path to the file to be read.
+    :type path: str | Path
+    :return: The contents of the file, with leading and trailing whitespace removed.
+    :rtype: str
     """
     with open(path, "r") as f:
         return f.read().strip()
@@ -33,27 +32,36 @@ def read_lines(path: str | Path) -> list[str]:
     """
     Read lines from a file and return them as a list of stripped strings.
 
-    Args:
-        path (str | Path): The path to the file to be read.
-
-    Returns:
-        list[str]: A list of strings, each representing a line from the file.
+    :param path: The path to the file to be read.
+    :type path: str | Path
+    :return: A list of strings, each representing a line from the file.
+    :rtype: list[str]
     """
-    return read_data(path).splitlines()
+    return [line.strip() for line in read_data(path).splitlines()]
 
 
-def read_numbers(path: str | Path) -> list[int]:
+@overload
+def parse_floats(s: str, as_generator: Literal[False] = ...) -> list[float]: ...
+
+
+@overload
+def parse_floats(s: str, as_generator: Literal[True]) -> map[float]: ...
+
+
+def parse_floats(s, as_generator=False):
     """
-    Read numbers from a file and return them as a list of integers.
+    Finds all floats in a string, including negative
 
-    Args:
-        path (str): The path to the file to be read.
-
-    Returns:
-        list[int]: A list of integers read from the file.
+    :param s: String to parse floats from
+    :type s: str
+    :return: A list of all floats in string
+    :rtype: list[float]
     """
-    lines = read_lines(path)
-    return list(map(int, lines))
+    res = map(float, re.findall(r"(-?\d+(?:\.\d+)?)", s))
+    if as_generator:
+        return res
+
+    return list(res)
 
 
 @overload
@@ -68,7 +76,7 @@ def parse_integers(s, as_generator=False):
     """
     Finds all integers in a string, including negative
 
-    :param s: String to pars integers from
+    :param s: String to parse integers from
     :type s: str
     :return: A list of all integers in string
     :rtype: list[int]
@@ -80,15 +88,27 @@ def parse_integers(s, as_generator=False):
     return list(res)
 
 
-def read_all_numbers(path: str | Path) -> list[list[int]]:
+def read_numbers(path: str | Path) -> list[int]:
+    """
+    Read all numbers in a file as integers and return them as a single list.
+
+    :param path: The path to the file to be read.
+    :type path: str | Path
+    :return: A list of integers read from the file.
+    :rtype: list[int]
+    """
+    with open(path, "r") as f:
+        return parse_integers(f.read())
+
+
+def read_line_numbers(path: str | Path) -> list[list[int]]:
     """
     For each line in a file, read all numbers on that line
 
-    Args:
-        path (str | Path): The path to the file to be read.
-
-    Returns:
-        list[list[int]]: A list of lists of integers read from each line of the file.
+    :param path: The path to the file to be read.
+    :type path: str | Path
+    :return: A list of lists of integers read from each line of the file.
+    :rtype: list[list[int]]
     """
     lines = read_lines(path)
     data = [parse_integers(line) for line in lines]
@@ -100,19 +120,20 @@ def sliding_window[T](
     window_size: int,
     step: int | None = None,
     include_remainder: bool = False,
-) -> Generator[Sequence[T], None, None]:
+) -> Iterator[Sequence[T]]:
     """
     Generate sliding windows from the input array.
 
-    Args:
-        array (list): The input array to generate windows from.
-        window_size (int): The size of each window.
-        step (int | None, optional): The step size between windows. Defaults to window_size if None.
-        include_remainder (bool, optional): If True, include the remaining elements
-                                            that don't fill a complete window. Defaults to False.
-
-    Yields:
-        list: A window of the specified size from the input array.
+    :param array: The input array to generate windows from.
+    :type array: Sequence[T]
+    :param window_size: The size of each window.
+    :type window_size: int
+    :param step: The step size between windows. Defaults to window_size if None.
+    :type step: int | None
+    :param include_remainder: If True, include the remaining elements that don't fill a complete window. Defaults to False.
+    :type include_remainder: bool
+    :return: A window of the specified size from the input array.
+    :rtype: Iterator[Sequence[T]]
     """  # noqa: E501
     if step is None:
         step = window_size
@@ -124,17 +145,18 @@ def sliding_window[T](
         yield array[i + step :]  # type: ignore
 
 
-def out_of_bounds(row: int, col: int, matrix: list[list]) -> bool:
+def out_of_bounds(row: int, col: int, matrix: Sequence[Sequence[Any]]) -> bool:
     """
     Check if the given row and column are out of bounds in the matrix.
 
-    Args:
-        row (int): The row index to check.
-        col (int): The column index to check.
-        matrix (list[list]): The 2D matrix to check against.
-
-    Returns:
-        bool: True if the position is out of bounds, False otherwise.
+    :param row: The row index to check.
+    :type row: int
+    :param col: The column index to check.
+    :type col: int
+    :param matrix: The 2D matrix to check against.
+    :type matrix: Sequence[Sequence[Any]]
+    :return: True if the position is out of bounds, False otherwise.
+    :rtype: bool
     """
     if row < 0 or row >= len(matrix):
         return True
@@ -177,24 +199,28 @@ def get_adjacent(
     """
     Get adjacent positions in a matrix for a given area.
 
-    Args:
-        row (int): Starting row of the area.
-        col (int): Starting column of the area.
-        matrix (Sequence[Sequence[T]]): The 2D matrix.
-        width (int, optional): Width of the area. Defaults to 1.
-        height (int, optional): Height of the area. Defaults to 1.
-        include_corners (bool, optional): Include corner positions. Defaults to True.
-        return_values (bool, optional): If True, return values will contain the values
-          at each position instead of the coordinates.
+    :param row: Starting row of the area.
+    :type row: int
+    :param col: Starting column of the area.
+    :type col: int
+    :param matrix: The 2D matrix.
+    :type matrix: Sequence[Sequence[T]]
+    :param width: Width of the area. Defaults to 1.
+    :type width: int
+    :param height: Height of the area. Defaults to 1.
+    :type height: int
+    :param include_corners: Include corner positions. Defaults to True.
+    :type include_corners: bool
+    :param return_values: If True, return values will contain the values at each position instead of the coordinates.
+    :type return_values: bool
+    :return: Set of adjacent positions or values.
+    :rtype: set[tuple[int, int]] | list[T]
 
-    Returns:
-        set[tuple[int, int]] | list[T]: Set of adjacent positions or values.
-
-    Note:
+    .. note::
         We use sets and tuples in this function for improved performance.
         Sets offer fast membership testing and uniqueness, while tuples are
         immutable and more memory-efficient than lists for storing coordinates.
-    """
+    """  # noqa: E501
     skip_positions = set(
         (row + i, col + j) for i in range(height) for j in range(width)
     )

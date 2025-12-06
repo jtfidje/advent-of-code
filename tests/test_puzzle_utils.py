@@ -47,11 +47,11 @@ def test_read_numbers(tmp_path):
         ],
     ],
 )
-def test_read_all_numbers(input_string: str, expected: list[list[int]], tmp_path):
+def test_read_line_numbers(input_string: str, expected: list[list[int]], tmp_path):
     test_file = tmp_path / "test.txt"
     test_file.write_text(input_string)
 
-    assert utils.read_all_numbers(test_file) == expected
+    assert utils.read_line_numbers(test_file) == expected
 
 
 @pytest.mark.parametrize(

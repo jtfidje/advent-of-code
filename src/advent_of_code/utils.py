@@ -55,6 +55,28 @@ def read_numbers(path: str | Path) -> list[int]:
     lines = read_lines(path)
     return list(map(int, lines))
 
+@overload
+def parse_integers(s: str, as_generator: Literal[False]) -> list[int]:
+    ...
+
+@overload
+def parse_integers(s: str, as_generator: Literal[True]) -> Generator[int, None, None]:
+    ...
+
+def parse_integers(s, as_generator=False):
+    """
+    Finds all integers in a string, including negative
+    
+    :param s: String to pars integers from
+    :type s: str
+    :return: A list of all integers in string
+    :rtype: list[int]
+    """
+    res = map(int, re.findall(r"(-?\d+)", s))
+    if as_generator:
+        return res
+    
+    return list(res)
 
 def read_all_numbers(path: str | Path) -> list[list[int]]:
     """
@@ -67,8 +89,7 @@ def read_all_numbers(path: str | Path) -> list[list[int]]:
         list[list[int]]: A list of lists of integers read from each line of the file.
     """
     lines = read_lines(path)
-    data = [re.findall(r"(-?\d+)", line) for line in lines]
-    data = [list(map(int, line)) for line in data]
+    data = [parse_integers(line) for line in lines]
     return data
 
 

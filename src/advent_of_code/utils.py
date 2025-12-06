@@ -1,8 +1,8 @@
 import json
 import re
-from pathlib import Path
-from typing import overload, Literal
 from collections.abc import Generator, Sequence
+from pathlib import Path
+from typing import Literal, overload
 
 
 def json_print(obj: dict | list) -> None:
@@ -55,18 +55,19 @@ def read_numbers(path: str | Path) -> list[int]:
     lines = read_lines(path)
     return list(map(int, lines))
 
-@overload
-def parse_integers(s: str, as_generator: Literal[False] = ...) -> list[int]:
-    ...
 
 @overload
-def parse_integers(s: str, as_generator: Literal[True] = ...) -> Generator[int, None, None]:
-    ...
+def parse_integers(s: str, as_generator: Literal[False] = ...) -> list[int]: ...
+
+
+@overload
+def parse_integers(s: str, as_generator: Literal[True]) -> map[int]: ...
+
 
 def parse_integers(s, as_generator=False):
     """
     Finds all integers in a string, including negative
-    
+
     :param s: String to pars integers from
     :type s: str
     :return: A list of all integers in string
@@ -75,8 +76,9 @@ def parse_integers(s, as_generator=False):
     res = map(int, re.findall(r"(-?\d+)", s))
     if as_generator:
         return res
-    
+
     return list(res)
+
 
 def read_all_numbers(path: str | Path) -> list[list[int]]:
     """
@@ -93,12 +95,12 @@ def read_all_numbers(path: str | Path) -> list[list[int]]:
     return data
 
 
-def sliding_window(
-    array: Sequence,
+def sliding_window[T](
+    array: Sequence[T],
     window_size: int,
     step: int | None = None,
     include_remainder: bool = False,
-) -> Generator[list, None, None]:
+) -> Generator[Sequence[T], None, None]:
     """
     Generate sliding windows from the input array.
 
@@ -152,8 +154,9 @@ def get_adjacent[T](
     height: int = ...,
     include_corners: bool = ...,
     *,
-    return_values: Literal[True]
+    return_values: Literal[True],
 ) -> list[T]: ...
+
 
 @overload
 def get_adjacent[T](
@@ -164,17 +167,12 @@ def get_adjacent[T](
     height: int = ...,
     include_corners: bool = ...,
     *,
-    return_values: Literal[False] = ...
+    return_values: Literal[False] = ...,
 ) -> set[tuple[int, int]]: ...
 
+
 def get_adjacent(
-    row,
-    col,
-    matrix,
-    width=1,
-    height=1,
-    include_corners=True,
-    return_values=False
+    row, col, matrix, width=1, height=1, include_corners=True, return_values=False
 ):
     """
     Get adjacent positions in a matrix for a given area.

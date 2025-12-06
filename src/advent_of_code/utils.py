@@ -56,11 +56,11 @@ def read_numbers(path: str | Path) -> list[int]:
     return list(map(int, lines))
 
 @overload
-def parse_integers(s: str, as_generator: Literal[False]) -> list[int]:
+def parse_integers(s: str, as_generator: Literal[False] = ...) -> list[int]:
     ...
 
 @overload
-def parse_integers(s: str, as_generator: Literal[True]) -> Generator[int, None, None]:
+def parse_integers(s: str, as_generator: Literal[True] = ...) -> Generator[int, None, None]:
     ...
 
 def parse_integers(s, as_generator=False):

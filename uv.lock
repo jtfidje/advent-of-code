@@ -21,6 +21,7 @@ members = [
     "aoc-2025-03",
     "aoc-2025-04",
     "aoc-2025-05",
+    "aoc-2025-06",
     "aoc-template",
 ]
 
@@ -148,6 +149,11 @@ source = { editable = "puzzles/aoc-2025-04" }
 name = "aoc-2025-05"
 version = "0.1.0"
 source = { editable = "puzzles/aoc-2025-05" }
+
+[[package]]
+name = "aoc-2025-06"
+version = "0.1.0"
+source = { editable = "puzzles/aoc-2025-06" }
 
 [[package]]
 name = "aoc-template"

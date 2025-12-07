@@ -1,8 +1,48 @@
+import functools
 import json
 import re
-from collections.abc import Iterator, Sequence
+import time
+from collections.abc import Callable, Iterator, Sequence
 from pathlib import Path
 from typing import Any, Literal, overload
+
+
+def performance_timer[**P, T](func: Callable[P, T]) -> Callable[P, T]:
+    """
+    Decorator that measures and prints the execution time of a function.
+
+    :param func: The function to be timed.
+    :type func: Callable[P, T]
+    :return: A wrapper function that times the execution of the decorated function and returns its result.
+    :rtype: Callable[P, T]
+
+    .. note::
+        Execution times less than 1 second are displayed in milliseconds,
+        otherwise they are displayed in seconds. Both with 4 decimals.
+    """  # noqa: E501
+
+    @functools.wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+        """
+        Wrapper function that times the execution of the decorated function.
+
+        :param args: Positional arguments to pass to the decorated function.
+        :param kwargs: Keyword arguments to pass to the decorated function.
+        :return: The result of the decorated function.
+        :rtype: T
+        """
+        start = time.perf_counter()
+        res = func(*args, **kwargs)
+        end = time.perf_counter()
+
+        if (elapsed := end - start) < 1:
+            print(f"Elapsed: {(elapsed) * 1_000:.4f}ms")
+        else:
+            print(f"Elapsed: {(elapsed):.4f}s")
+
+        return res
+
+    return wrapper
 
 
 def json_print(obj: dict | list) -> None:

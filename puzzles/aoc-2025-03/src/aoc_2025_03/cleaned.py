@@ -1,17 +1,15 @@
-import string
+import time
 from pathlib import Path
 
 from advent_of_code.utils import read_lines
 from aoc_2025_03 import DATA_PATH
-
-DIGITS = sorted(string.digits, reverse=True)
 
 
 def worker(line: str, batteries: str, size: int) -> str:
     if not line:
         return ""
 
-    for digit in DIGITS:
+    for digit in sorted(set(line), reverse=True):
         for i, char in enumerate(line):
             if char == digit:
                 batteries_ = batteries + char
@@ -19,10 +17,15 @@ def worker(line: str, batteries: str, size: int) -> str:
         else:
             continue
 
+        new_line = line[i + 1 :]
+
+        if len(new_line) + len(batteries_) < size:
+            continue
+
         if len(batteries_) == size:
             return batteries_
 
-        batteries_ = worker(line[i + 1 :], batteries_, size)
+        batteries_ = worker(new_line, batteries_, size)
         if not batteries_:
             continue
 
@@ -42,8 +45,17 @@ def solve_2(path: Path):
 
 
 if __name__ == "__main__":
+    start = time.perf_counter()
     answer = solve_1(DATA_PATH / "input.txt")
     print(f"Problem 1: {answer}")
 
     answer = solve_2(DATA_PATH / "input.txt")
     print(f"Problem 2: {answer}")
+    end = time.perf_counter()
+
+    elapsed = end - start
+
+    if elapsed > 0:
+        print(f"Elapsed: {(end - start) * 1_000:.4f}ms")
+    else:
+        print(f"Elapsed: {(end - start):.4f}s")

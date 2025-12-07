@@ -5,6 +5,7 @@ from advent_of_code import utils
 from aoc_2025_07 import DATA_PATH
 
 
+@utils.performance_timer
 def solve_1(path: Path):
     data = utils.read_lines(path)
     beam_positions: list[tuple[int, int]] = [(0, data[0].index("S"))]
@@ -37,6 +38,7 @@ def solve_1(path: Path):
     return splits
 
 
+@utils.performance_timer
 def solve_2(path: Path):
     data = utils.read_lines(path)
     beam_pos = (0, data[0].index("S"))
@@ -72,6 +74,6 @@ def solve_2(path: Path):
 if __name__ == "__main__":
     answer = solve_1(DATA_PATH / "input.txt")
     print(f"Problem 1: {answer}")
-
+    print()
     answer = solve_2(DATA_PATH / "input.txt")
     print(f"Problem 2: {answer}")

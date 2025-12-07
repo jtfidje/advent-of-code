@@ -1,7 +1,6 @@
-import time
 from pathlib import Path
 
-from advent_of_code.utils import read_lines
+from advent_of_code import utils
 from aoc_2025_03 import DATA_PATH
 
 
@@ -34,28 +33,21 @@ def worker(line: str, batteries: str, size: int) -> str:
     return ""
 
 
+@utils.performance_timer
 def solve_1(path: Path):
-    data = read_lines(path)
+    data = utils.read_lines(path)
     return sum(int(worker(line, "", 2)) for line in data)
 
 
+@utils.performance_timer
 def solve_2(path: Path):
-    data = read_lines(path)
+    data = utils.read_lines(path)
     return sum(int(worker(line, "", 12)) for line in data)
 
 
 if __name__ == "__main__":
-    start = time.perf_counter()
     answer = solve_1(DATA_PATH / "input.txt")
     print(f"Problem 1: {answer}")
-
+    print()
     answer = solve_2(DATA_PATH / "input.txt")
     print(f"Problem 2: {answer}")
-    end = time.perf_counter()
-
-    elapsed = end - start
-
-    if elapsed > 0:
-        print(f"Elapsed: {(end - start) * 1_000:.4f}ms")
-    else:
-        print(f"Elapsed: {(end - start):.4f}s")

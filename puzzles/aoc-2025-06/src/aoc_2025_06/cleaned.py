@@ -5,6 +5,7 @@ from advent_of_code import utils
 from aoc_2025_06 import DATA_PATH
 
 
+@utils.performance_timer
 def solve_1(path: Path):
     data = re.sub(r" {2,}", " ", utils.read_data(path)).splitlines()
     number_lines = map(lambda x: x.strip().split(), data[:-1])
@@ -16,6 +17,7 @@ def solve_1(path: Path):
     )
 
 
+@utils.performance_timer
 def solve_2(path: Path):
     data = utils.read_data(path).splitlines()
 
@@ -40,6 +42,6 @@ def solve_2(path: Path):
 if __name__ == "__main__":
     answer = solve_1(DATA_PATH / "input.txt")
     print(f"Problem 1: {answer}")
-
+    print()
     answer = solve_2(DATA_PATH / "input.txt")
     print(f"Problem 2: {answer}")

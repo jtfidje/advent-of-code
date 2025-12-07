@@ -187,7 +187,7 @@ def start_watcher(project_path: Path):
             "bash -c '"
             f"while inotifywait -q -re modify {project_path} ; "
             "do clear && "
-            f"uv run --package {project_path.name} pytest {project_path}/test_solutions.py -p no:cacheprovider -s && "  # noqa: E501
+            f"uv run --package {project_path.name} pytest {project_path}/test_solutions.py -p no:cacheprovider -s -q && "  # noqa: E501
             f"uv run --package {project_path.name} python {project_path}/part_1.py && "
             f"uv run --package {project_path.name} python {project_path}/part_2.py ; "
             "done'"

@@ -30,12 +30,14 @@ def aggregate_ranges(ranges: list[Range]):
             agg.append(curr)
             curr = r
 
-        elif r.start <= curr.stop and r.stop >= curr.stop:
-            curr.stop = r.stop
+        elif r.start <= curr.stop:
+            curr.stop = max(r.stop, curr.stop)
+
     agg.append(curr)
     return agg
 
 
+@utils.performance_timer
 def solve_1(path: Path):
     range_data, id_data = utils.read_data(path).split("\n\n")
     ranges = parse_ranges(range_data)
@@ -51,6 +53,7 @@ def solve_1(path: Path):
     return fresh
 
 
+@utils.performance_timer
 def solve_2(path: Path):
     data = utils.read_data(path)
     range_data, _ = data.split("\n\n")
@@ -63,6 +66,6 @@ def solve_2(path: Path):
 if __name__ == "__main__":
     answer = solve_1(DATA_PATH / "input.txt")
     print(f"Problem 1: {answer}")
-
+    print()
     answer = solve_2(DATA_PATH / "input.txt")
     print(f"Problem 2: {answer}")

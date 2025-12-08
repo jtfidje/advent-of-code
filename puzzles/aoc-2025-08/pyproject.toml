@@ -1,0 +1,15 @@
+[project]
+name = "aoc-2025-08"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Jahn Thomas Fidje", email = "jtfidje@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "scipy>=1.16.3",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.13,<0.10.0"]
+build-backend = "uv_build"

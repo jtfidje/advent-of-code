@@ -1,6 +1,10 @@
 # flake8: noqa: F401
 
+import itertools
 from pathlib import Path
+
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 
 from advent_of_code import utils
 from aoc_2025_09 import DATA_PATH
@@ -14,7 +18,7 @@ def print_grid(grid: list[list[str]]):
     print()
 
 
-def solve(path: str | Path):
+def solve_backup(path: str | Path):
     data = utils.read_line_numbers(path)
     data.append(data[0])
     data = [(x, y) for x, y in data]
@@ -27,49 +31,81 @@ def solve(path: str | Path):
         )
         ranges.append(r)
 
-    data.append(data[1])
-
     ranges = sorted(ranges, key=lambda x: (x[0].start, x[1].start))
-
-    corner_pairs: list[tuple[tuple[int, int], tuple[int, int]]] = []
     best = 0
-    for a, point, b in utils.sliding_window(data, window_size=3, step=1):
-        # Check left, down
-        for x in range(a[0], b[0]):
-            p = (x, b[1])
-            if p in data:
-                corner_pairs.append((point, p))
-                best = max(
-                    best, ((abs(point[0] - p[0]) + 1) * (abs(point[1] - p[1]) + 1))
-                )
+    polygon = Polygon(data[:-1])
+    for X, A in itertools.combinations(data[:-1], 2):
+        x, y = X
+        a, b = A
+
+        area = (abs(a - x) + 1) * (abs(b - y) + 1)
+
+        if area <= best:
+            continue
+
+        for i in range(min(x, a), max(x, a) + 1):
+            for j in range(min(y, b), max(y, b) + 1):
+                if not polygon.covers(Point(i, j)):
+                    break
+            else:
+                continue
+
+            break
+        else:
+            best = max(best, area)
+
+    return best
+
+
+@utils.performance_timer
+def solve(path: str | Path):
+    data = utils.read_line_numbers(path)
+    data.append(data[0])
+    data = [(x, y) for x, y in data]
+
+    boundary = set()
+    max_x = 0
+    max_y = 0
+    for a, b in utils.sliding_window(data, window_size=2, step=1):
+        for x in range(min(a[0], b[0]), max(a[0], b[0]) + 1):
+            for y in range(min(a[1], b[1]), max(a[1], b[1]) + 1):
+                max_x = max(max_x, x)
+                max_y = max(max_y, y)
+                boundary.add((x, y))
+
+    best = 0
+    seen = set()
+    for X, A in itertools.combinations(data[:-1], 2):
+        x, y = X
+        a, b = A
+        area = (abs(a - x) + 1) * (abs(b - y) + 1)
+
+        if area <= best:
+            continue
+
+        for i in range(min(x, a), max(x, a) + 1):
+            for j in range(min(y, b), max(y, b) + 1):
+                point = (i, j)
+
+                if point in seen or point in boundary:
+                    continue
+
+                crossings = sum((x_, j) in boundary for x_ in range(i + 1, max_x + 1))
+                if crossings % 2 == 1:
+                    seen.add(point)
+                    continue
+
+                # Point is not inside polygon...
                 break
 
-        # Check right, down
-        for i in range(a[0] + 1, b[0] + 1):
-            p = (i, a[1])
-            if p in data:
-                corner_pairs.append((point, p))
-                best = max(
-                    best, ((abs(point[0] - p[0]) + 1) * (abs(point[1] - p[1]) + 1))
-                )
-                break
+            else:
+                continue
 
-        # Check left, up
-        min_y = min(point[1], a[1])
-        min_x = min(point[0], a[0])
+            break
 
-        for x in range(point[0] - 1, min_x + 1, -1):
-            p = (x, min_y)
-            if p in data:
-                corner_pairs.append((point, p))
-                best = max(
-                    best, ((abs(point[0] - p[0]) + 1) * (abs(point[1] - p[1]) + 1))
-                )
-                break
+        else:
+            best = max(best, area)
 
-    # print()
-    # for pair in corner_pairs:
-    #     print(*pair)
     return best
 
 
@@ -87,6 +123,7 @@ def solve(path: str | Path):
 
 
 if __name__ == "__main__":
+    # answer = solve(DATA_PATH / "example_1_1.txt")
     answer = solve(DATA_PATH / "input.txt")
     if answer is not None:
         print(f"Problem 2: {answer}")

@@ -1,14 +1,12 @@
 [project]
-name = "aoc-2025-09"
+name = "aoc-2015-18"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
     { name = "Jahn Thomas Fidje", email = "jtfidje@gmail.com" }
 ]
 requires-python = ">=3.14"
-dependencies = [
-    "shapely>=2.1.2",
-]
+dependencies = []
 
 [build-system]
 requires = ["uv_build>=0.9.13,<0.10.0"]

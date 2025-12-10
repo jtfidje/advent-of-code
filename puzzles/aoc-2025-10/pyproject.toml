@@ -1,5 +1,5 @@
 [project]
-name = "aoc-2025-09"
+name = "aoc-2025-10"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
@@ -7,7 +7,7 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "shapely>=2.1.2",
+    "numpy>=2.3.5",
 ]
 
 [build-system]

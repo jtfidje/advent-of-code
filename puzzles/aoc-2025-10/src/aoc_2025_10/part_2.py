@@ -51,7 +51,9 @@ def solve(path: str | Path):
             if node.state == target:
                 best = min(node.press_id, best)
                 to_visit = [n for n in to_visit if n.press_id < best]
-                visited = {state: press_id for press_id, state in node.get_state_path()}
+                for press_id, state in node.get_state_path():
+                    visited[state] = press_id
+
                 continue
 
             new_nodes: list[Node] = []
@@ -63,7 +65,9 @@ def solve(path: str | Path):
                 for i in button:
                     new_state[i] += 1
 
-                new_node = Node(press_id=node.press_id + 1, state=new_state)
+                new_node = Node(
+                    press_id=node.press_id + 1, state=new_state, parent=node
+                )
 
                 if new_node.press_id >= best:
                     continue
@@ -87,7 +91,7 @@ def solve(path: str | Path):
 
 
 if __name__ == "__main__":
-    answer = solve(DATA_PATH / "example_1_1.txt")
-    # answer = solve(DATA_PATH / "input.txt")
+    # answer = solve(DATA_PATH / "example_1_1.txt")
+    answer = solve(DATA_PATH / "input.txt")
     if answer is not None:
         print(f"Problem 2: {answer}")

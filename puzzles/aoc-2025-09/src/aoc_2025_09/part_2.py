@@ -74,37 +74,48 @@ def solve(path: str | Path):
                 boundary.add((x, y))
 
     best = 0
-    seen = set()
+    seen_outside = set()
+    seen_inside = set()
     for X, A in itertools.combinations(data[:-1], 2):
         x, y = X
         a, b = A
+        if x == a or y == b:
+            continue
+
         area = (abs(a - x) + 1) * (abs(b - y) + 1)
 
         if area <= best:
             continue
+        min_x_, max_x_ = min(x, a), max(x, a)
+        min_y_, max_y_ = min(y, b), max(y, b)
+        border_ = []
+        for x_ in range(min_x_, max_x_ + 1):
+            border_.append((x_, min_y_))
+            border_.append((x_, max_y_))
+        for y_ in range(min_y_, max_y_ + 1):
+            border_.append((min_x_, y_))
+            border_.append((max_x_, y_))
 
-        for i in range(min(x, a), max(x, a) + 1):
-            for j in range(min(y, b), max(y, b) + 1):
-                point = (i, j)
-
-                if point in seen or point in boundary:
-                    continue
-
-                crossings = sum((x_, j) in boundary for x_ in range(i + 1, max_x + 1))
-                if crossings % 2 == 1:
-                    seen.add(point)
-                    continue
-
-                # Point is not inside polygon...
+        for point in border_:
+            if point in seen_outside:
                 break
 
-            else:
+            if point in boundary or point in seen_inside:
                 continue
 
-            break
+            crossings = sum(
+                (x_, point[1]) in boundary for x_ in range(point[0] + 1, max_x + 1)
+            )
+
+            if crossings % 2 == 0:
+                seen_outside.add(point)
+                break
+            else:
+                seen_inside.add(point)
 
         else:
             best = max(best, area)
+            print(best)
 
     return best
 

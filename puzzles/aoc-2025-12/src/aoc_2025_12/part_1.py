@@ -2,6 +2,7 @@
 import re
 from pathlib import Path
 from copy import deepcopy
+import numpy as np
 
 from advent_of_code import utils
 from aoc_2025_12 import DATA_PATH
@@ -22,62 +23,37 @@ def rotate_piece(piece: list[list[str]]) -> list[list[str]]:
     return new_piece
 
 
-def worker(grid: list[list[str]], pieces: list[list[list[str]]]) -> bool:
+def worker(grid: np.ndarray, pieces: list[np.ndarray]) -> bool:
     if not pieces:
-        print_grid(grid)
+        print(grid)
         print()
         return True
 
-    piece = pieces[0]
-    num_to_fit = sum(row.count("#") for row in piece)
+    num_to_fit = pieces[0].sum()
 
-    height = len(piece)
-    width = len(piece[0])
-
-    for row_i in range(0, len(grid) - height + 1):
-        for col_i in range(0, len(grid[0]) - width + 1):
-            box = [row[col_i : col_i + width] for row in grid[row_i : row_i + height]]
-
-            box_points = []
-            # Get coordinates for the box
-            for r in range(row_i, row_i + height):
-                for c in range(col_i, col_i + width):
-                    box_points.append((r, c))
+    p_height, p_width = pieces[0].shape
+    g_height, g_width = grid.shape
+    for row_i in range(0, g_height - p_height + 1):
+        for col_i in range(0, g_width - p_width + 1):
+            box = grid[row_i : row_i + p_height, col_i : col_i + p_width]
 
             # naively check if the piece actually would fit in the box
-            if sum(grid[r][c] == "." for r, c in box_points) < num_to_fit:
+            if np.logical_not(box).sum() < num_to_fit:
                 continue
 
             for i in range(4):
-                if i > 0:
-                    piece = rotate_piece(piece)
+                piece = np.rot90(pieces[0], k=i)
 
-                will_fit = True
-                for i, row in enumerate(piece):
-                    for j, col in enumerate(row):
-                        if col == "#" and box[i][j] == "#":
-                            will_fit = False
-                            break
-                    else:
-                        continue
+                combined = np.logical_not(np.logical_and(box, piece))
 
-                    break
+                if np.all(combined):
+                    new_grid = grid.copy()
+                    new_grid[row_i : row_i + p_height, col_i : col_i + p_width] |= piece
 
-                if not will_fit:
-                    continue
+                    res = worker(grid=new_grid, pieces=pieces[1:])
 
-                new_grid = deepcopy(grid)
-
-                for value, (r, c) in zip(
-                    (col for row in piece for col in row), box_points
-                ):
-                    if value == "#":
-                        new_grid[r][c] = value
-
-                res = worker(grid=new_grid, pieces=pieces[1:])
-
-                if res:
-                    return True
+                    if res:
+                        return True
 
     return False
 
@@ -98,12 +74,14 @@ def solve(path: str | Path):
 
     result = 0
     for x, y, target in regions:
-        grid = [["."] * x for _ in range(y)]
+        grid = np.zeros(shape=(x, y), dtype=bool)
 
-        pieces = []
+        pieces: list[np.ndarray] = []
         for i, num in enumerate(target):
             if num:
-                pieces.extend([piece_map[i]] * num)
+                p = piece_map[i]
+                piece = np.array([[col == "#" for col in row] for row in p], dtype=bool)
+                pieces.extend([piece] * 2)
 
         result += worker(grid, pieces)
 

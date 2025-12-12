@@ -294,3 +294,31 @@ def get_adjacent(
         return [matrix[x][y] for x, y in adjacent]
 
     return adjacent
+
+
+def sliding_box(
+    matrix: list[list[Any]],
+    width: int,
+    height: int,
+    x_step: int | None,
+    y_step: int | None,
+    include_remainder: bool = False,
+) -> Iterator[list[list[Any]]]:
+    """
+    [
+        [ 1,  2,  3,  4],
+        [ 5,  6,  7,  8],
+        [ 9, 10, 11, 12],
+        [13, 14, 15, 16]
+    ]
+
+    """
+    if x_step is None:
+        x_step = width
+
+    if y_step is None:
+        y_step = height
+
+    for row_i in range(0, len(matrix) - height + 1, y_step):
+        for col_i in range(0, len(matrix[0]) - width + 1, x_step):
+            yield [row[col_i : col_i + width] for row in matrix[row_i : row_i + height]]

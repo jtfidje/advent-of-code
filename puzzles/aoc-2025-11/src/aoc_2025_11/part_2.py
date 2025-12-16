@@ -29,42 +29,45 @@ class Node:
 
 
 def worker(
-    node: Node, connections: dict[str, list[str]], totals: dict[str, int]
-) -> int:
+    node: Node, connections: dict[str, list[str]], totals: dict[str, list[int | bool]]
+) -> list[int | bool]:
     if node.name == "out":
-        totals["__score__"] += "dac" in node.path and "fft" in node.path
-        return 1
-
-    if ("dac" in node.path and "fft" in node.path) and node.name in totals:
-        totals["__score__"] += totals[node.name]
-        return totals[node.name]
+        return [1, False, False]
 
     result = 0
     for name in connections[node.name]:
         if name in node.path:
             continue
 
+        if name in totals:
+            res, *_ = totals[name]
+            result += res
+            continue
+
         child = Node(name, parent=node)
-        result += worker(child, connections, totals)
+        res, *_ = worker(child, connections, totals)
+        result += res
 
     totals[node.name] = result
+    totals["__total__"] += result
     return result
 
 
+@utils.performance_timer
 def solve(path: str | Path):
     data = utils.read_lines(path)
 
-    connections: dict[str, list[str]] = {}
+    connections: dict[str, list[str]] = {"out": []}
     for line in data:
         x, y = line.split(": ")
         y = y.split()
 
         connections[x] = y
 
-    totals = {"__score__": 0}
-    worker(node=Node("svr"), connections=connections, totals=totals)
-
-    return totals["__score__"]
+    totals: dict[str, list[int | bool]] = {}
+    res = worker(node=Node("svr"), connections=connections, totals=totals)
+    print(totals["fft"])
+    print(totals["dac"])
 
 
 if __name__ == "__main__":

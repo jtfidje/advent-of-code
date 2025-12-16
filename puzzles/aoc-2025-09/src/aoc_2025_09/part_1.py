@@ -13,10 +13,7 @@ def solve(path: str | Path):
     best = 0
     for X, A in itertools.combinations(data, 2):
         x, y = X
-        (
-            a,
-            b,
-        ) = A
+        a, b = A
 
         best = max(best, ((abs(a - x) + 1) * (abs(b - y) + 1)))
 

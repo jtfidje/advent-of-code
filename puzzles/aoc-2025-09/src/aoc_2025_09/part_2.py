@@ -76,46 +76,47 @@ def solve(path: str | Path):
     best = 0
     seen_outside = set()
     seen_inside = set()
-    for X, A in itertools.combinations(data[:-1], 2):
-        x, y = X
-        a, b = A
-        if x == a or y == b:
-            continue
-
-        area = (abs(a - x) + 1) * (abs(b - y) + 1)
-
-        if area <= best:
-            continue
-        min_x_, max_x_ = min(x, a), max(x, a)
-        min_y_, max_y_ = min(y, b), max(y, b)
-        border_ = []
-        for x_ in range(min_x_, max_x_ + 1):
-            border_.append((x_, min_y_))
-            border_.append((x_, max_y_))
-        for y_ in range(min_y_, max_y_ + 1):
-            border_.append((min_x_, y_))
-            border_.append((max_x_, y_))
-
-        for point in border_:
-            if point in seen_outside:
-                break
-
-            if point in boundary or point in seen_inside:
+    for i, X in enumerate(data[:-2]):
+        for A in data[i + 1 : -1]:
+            x, y = X
+            a, b = A
+            if x == a or y == b or x == b or y == a:
                 continue
 
-            crossings = sum(
-                (x_, point[1]) in boundary for x_ in range(point[0] + 1, max_x + 1)
-            )
+            area = (abs(a - x) + 1) * (abs(b - y) + 1)
 
-            if crossings % 2 == 0:
-                seen_outside.add(point)
-                break
+            if area <= best:
+                continue
+            min_x_, max_x_ = min(x, a), max(x, a)
+            min_y_, max_y_ = min(y, b), max(y, b)
+            border_ = []
+            for x_ in range(min_x_, max_x_ + 1):
+                border_.append((x_, min_y_))
+                border_.append((x_, max_y_))
+            for y_ in range(min_y_, max_y_ + 1):
+                border_.append((min_x_, y_))
+                border_.append((max_x_, y_))
+
+            for point in border_:
+                if point in seen_outside:
+                    break
+
+                if point in boundary or point in seen_inside:
+                    continue
+
+                crossings = sum(
+                    (x_, point[1]) in boundary for x_ in range(point[0] + 1, max_x + 1)
+                )
+
+                if crossings % 2 == 0:
+                    seen_outside.add(point)
+                    break
+                else:
+                    seen_inside.add(point)
+
             else:
-                seen_inside.add(point)
-
-        else:
-            best = max(best, area)
-            print(best)
+                best = max(best, area)
+                print(best)
 
     return best
 

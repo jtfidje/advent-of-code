@@ -32,24 +32,33 @@ def worker(
     node: Node, connections: dict[str, list[str]], totals: dict[str, list[int | bool]]
 ) -> list[int | bool]:
     if node.name == "out":
-        return [1, False, False]
+        return [1, 0, 0]
 
-    result = 0
+    result = [0, 0, 0]
     for name in connections[node.name]:
         if name in node.path:
             continue
 
         if name in totals:
-            res, *_ = totals[name]
-            result += res
+            res = totals[name]
+            result[0] += res[0]
+            result[1] += res[1]
+            result[2] += res[2]
             continue
 
         child = Node(name, parent=node)
-        res, *_ = worker(child, connections, totals)
-        result += res
+        res = worker(child, connections, totals)
+        result[0] += res[0]
+        result[1] += res[1]
+        result[2] += res[2]
+
+    if node.name == "dac":
+        result = [result[0], sum(result), result[2]]
+
+    if node.name == "fft":
+        result = [result[0], result[1], result[2] + result[1]]
 
     totals[node.name] = result
-    totals["__total__"] += result
     return result
 
 
@@ -66,8 +75,7 @@ def solve(path: str | Path):
 
     totals: dict[str, list[int | bool]] = {}
     res = worker(node=Node("svr"), connections=connections, totals=totals)
-    print(totals["fft"])
-    print(totals["dac"])
+    return res[2]
 
 
 if __name__ == "__main__":
